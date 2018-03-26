@@ -1,7 +1,7 @@
 #include "cpu.h"
 
 #include "nes.h"
-#include "ops.h"
+#include "op.h"
 
 #include <vector>
 #include <cstdio>
@@ -13,8 +13,8 @@ CPU::CPU(NES *nes)
               0,                // x
               0,                // y
               CPUFlag::UNUSED,  // p, unused flag must always be set.
-              0x00,             // pc
-              0xFF              // sp
+              0xFF,             // sp
+              0x0000            // pc
       })
 {
 }
@@ -43,21 +43,27 @@ void CPU::step() {
     const uint8_t op = fetch();
     const Op::Opcode *opDecoded = Op::decode(op);
 
+    if (opDecoded == nullptr) {
+        fprintf(stderr, "0x%02X was not a valid opcode!", op);
+        return;
+    }
+
+    const size_t operandCount = Op::getAddressingModeOperandCount(opDecoded->mode);
+
 #ifdef NESULATOR_DEBUG
     printf("%s\n", opDecoded->name);
 #endif
 
     std::vector<uint8_t> operands;
-    operands.reserve(opDecoded->operands);
-    fetchOperands(opDecoded->operands, operands);
-    opDecoded->handler(this, operands);
+    operands.reserve(operandCount);
+    fetchOperands(operandCount, operands);
+    opDecoded->handler(this, operands, opDecoded);
 }
 
 uint8_t CPU::fetch() {
     Memory *mem = nes->getMemory();
-    uint16_t *pc = &nes->getCPU()->getRegisterFile()->pc;
-    uint8_t op = mem->read((Address)*pc);
-    *pc += 1;
+    uint8_t op = mem->read((Address)r.pc);
+    r.pc++;
     return op;
 }
 

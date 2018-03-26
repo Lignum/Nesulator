@@ -9,4 +9,4 @@ else()
     set(CMAKE_CXX_FLAGS_DEBUG "-DNESULATOR_DEBUG")
 endif()
 
-add_executable(Nesulator src/main.cpp src/nes.cpp src/nes.h src/cpu.h src/cpu.cpp src/memory.cpp src/memory.h src/utils.h src/ops.h src/ops.cpp src/ops/irq.h src/ops/irq.cpp)
+add_executable(Nesulator src/main.cpp src/nes.cpp src/nes.h src/cpu.h src/cpu.cpp src/memory.cpp src/memory.h src/utils.h src/op.h src/op.cpp src/op/irq.h src/op/irq.cpp)
