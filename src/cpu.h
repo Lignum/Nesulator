@@ -1,6 +1,8 @@
 #pragma once
 
 #include <cstdint>
+#include <cstdlib>
+#include <vector>
 
 enum class CPUFlag: uint8_t {
     CARRY           = 1 << 0,
@@ -36,7 +38,13 @@ public:
 
     void setFlag(CPUFlag flag, bool set);
 
+    void step();
+
 private:
     NES *nes;
     RegisterFile r;
+
+    uint8_t fetch();
+
+    void fetchOperands(size_t count, std::vector<uint8_t> &operands);
 };

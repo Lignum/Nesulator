@@ -12,16 +12,16 @@ Memory::Memory(NES *nes)
 }
 
 uint8_t Memory::read(Address address) const {
-    if (Utils::inRange(address, (Address)0x0000, (Address)0x07FF)) {
-        return internalMem[address];
+    if (Utils::inRange(address, (Address)0x0000, (Address)0x1FFF)) {
+        return internalMem[address % 0x0800];
     } else {
         // Pass call on to mapper.
     }
 }
 
 void Memory::write(Address address, uint8_t value) {
-    if (Utils::inRange(address, (Address)0x0000, (Address)0x07FF)) {
-        internalMem[address] = value;
+    if (Utils::inRange(address, (Address)0x0000, (Address)0x1FFF)) {
+        internalMem[address % 0x0800] = value;
     } else {
         // Pass call on to mapper.
     }

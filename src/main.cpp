@@ -1,7 +1,7 @@
-#include <iostream>
-
 #include "nes.h"
 
 int main() {
-    return EXIT_SUCCESS;
+    NES nes;
+    nes.getCPU()->step();
+    return 0;
 }
