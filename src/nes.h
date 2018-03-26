@@ -1,6 +1,7 @@
 #pragma once
 
 #include "cpu.h"
+#include "memory.h"
 
 class NES {
 public:
@@ -8,6 +9,9 @@ public:
 
     CPU *getCPU();
 
+    Memory *getMemory();
+
 private:
     CPU cpu;
+    Memory mem;
 };

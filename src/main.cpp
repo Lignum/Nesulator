@@ -3,6 +3,5 @@
 #include "nes.h"
 
 int main() {
-    NES nes;
-    return 0;
+    return EXIT_SUCCESS;
 }

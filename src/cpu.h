@@ -26,7 +26,7 @@ class NES;
 
 class CPU {
 public:
-    CPU(NES *nes);
+    explicit CPU(NES *nes);
 
     NES *getNES();
 
