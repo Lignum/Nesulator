@@ -9,12 +9,12 @@
 CPU::CPU(NES *nes)
     : nes(nes),
       r(RegisterFile {
-              0,                // a
-              0,                // x
-              0,                // y
-              CPUFlag::UNUSED,  // p, unused flag must always be set.
-              0xFF,             // sp
-              0x0000            // pc
+          0,                // a
+          0,                // x
+          0,                // y
+          CPUFlag::UNUSED,  // p, unused flag must always be set.
+          0xFF,             // sp
+          0x0000            // pc
       })
 {
 }
