@@ -20,7 +20,7 @@ struct RegisterFile {
     uint8_t x;      // X Index Register
     uint8_t y;      // Y Index Register
     CPUFlag p;      // Processor Status (Flags)
-    uint8_t sp;     // Stack Pointer
+    uint8_t s;      // Stack Pointer
     uint16_t pc;    // Program Counter
 };
 

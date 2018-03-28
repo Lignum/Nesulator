@@ -15,7 +15,7 @@ CPU::CPU(NES *nes)
           0,                // x
           0,                // y
           CPUFlag::UNUSED,  // p, unused flag must always be set.
-          0xFF,             // sp
+          0xFF,             // s
           0x0000            // pc
       })
 {
@@ -91,7 +91,7 @@ void CPU::printState() const {
     Utils::writeHexToStream(std::cout, r.p);
 
     std::cout << ", SP=$";
-    Utils::writeHexToStream(std::cout, r.sp);
+    Utils::writeHexToStream(std::cout, r.s);
 
     std::cout << ", PC=$";
     Utils::writeHexToStream(std::cout, r.pc);

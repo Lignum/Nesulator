@@ -3,13 +3,13 @@
 #include "../cpu.h"
 #include "../op.h"
 
-#define LDx(reg) \
-    unsigned int Op::ld##reg(CPU *cpu, Op::Operands &operands, const Op::Opcode *opcode) { \
-        cpu->getRegs()->a = Op::address(cpu, opcode->mode, operands); \
-        Op::setNZFlags(cpu, cpu->getRegs()->a); \
+#define LD(x) \
+    unsigned int Op::ld##x(CPU *cpu, Op::Operands &operands, const Op::Opcode *opcode) { \
+        cpu->getRegs()->x = Op::address(cpu, opcode->mode, operands); \
+        Op::setNZFlags(cpu, cpu->getRegs()->x); \
         return 0; \
     }
 
-LDx(a);
-LDx(x);
-LDx(y);
+LD(a);
+LD(x);
+LD(y);

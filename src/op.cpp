@@ -6,6 +6,7 @@
 #include "op/irq.h"
 #include "op/loads.h"
 #include "op/stores.h"
+#include "op/transfers.h"
 #include "utils.h"
 
 #include <vector>
@@ -207,7 +208,7 @@ static const Opcode OPCODES[] = {
     UNSUPPORTED_OP(0x87, "SAX", AM::ZERO_PAGE, 3),
     OP(0x88, "DEY", AM::IMPLICIT, unimplemented, 2),
     UNSUPPORTED_OP(0x89, "NOP", AM::IMMEDIATE, 2),
-    OP(0x8A, "TXA", AM::IMPLICIT, unimplemented, 2),
+    OP(0x8A, "TXA", AM::IMPLICIT, Op::txa, 2),
     UNSUPPORTED_OP(0x8B, "XAA", AM::IMMEDIATE, 2),
     OP(0x8C, "STY", AM::ABSOLUTE, Op::sty, 4),
     OP(0x8D, "STA", AM::ABSOLUTE, Op::sta, 4),
@@ -225,9 +226,9 @@ static const Opcode OPCODES[] = {
     OP(0x95, "STA", AM::ZERO_PAGE_X, Op::sta, 4),
     OP(0x96, "STX", AM::ZERO_PAGE_Y, Op::stx, 4),
     UNSUPPORTED_OP(0x97, "SAX", AM::ZERO_PAGE_Y, 4),
-    OP(0x98, "TYA", AM::IMPLICIT, unimplemented, 2),
+    OP(0x98, "TYA", AM::IMPLICIT, Op::tya, 2),
     OP(0x99, "STA", AM::ABSOLUTE_Y, Op::sta, 5),
-    OP(0x9A, "TXS", AM::IMPLICIT, unimplemented, 2),
+    OP(0x9A, "TXS", AM::IMPLICIT, Op::txs, 2),
     UNSUPPORTED_OP(0x9B, "TAS", AM::ABSOLUTE_Y, 5),
     UNSUPPORTED_OP(0x9C, "SHY", AM::ABSOLUTE_X, 5),
     OP(0x9D, "STA", AM::ABSOLUTE_X, Op::sta, 5),
@@ -245,9 +246,9 @@ static const Opcode OPCODES[] = {
     OP(0xA5, "LDA", AM::ZERO_PAGE, Op::lda, 3),
     OP(0xA6, "LDX", AM::ZERO_PAGE, Op::ldx, 3),
     UNSUPPORTED_OP(0xA7, "LAX", AM::ZERO_PAGE, 3),
-    OP(0xA8, "TAY", AM::IMPLICIT, unimplemented, 2),
+    OP(0xA8, "TAY", AM::IMPLICIT, Op::tay, 2),
     OP(0xA9, "LDA", AM::IMMEDIATE, Op::lda, 2),
-    OP(0xAA, "TAX", AM::IMPLICIT, unimplemented, 2),
+    OP(0xAA, "TAX", AM::IMPLICIT, Op::tax, 2),
     UNSUPPORTED_OP(0xAB, "LAX", AM::IMMEDIATE, 2),
     OP(0xAC, "LDY", AM::ABSOLUTE, Op::ldy, 4),
     OP(0xAD, "LDA", AM::ABSOLUTE, Op::lda, 4),
@@ -267,7 +268,7 @@ static const Opcode OPCODES[] = {
     UNSUPPORTED_OP(0xB7, "LAX", AM::ZERO_PAGE_Y, 4),
     OP(0xB8, "CLV", AM::IMPLICIT, unimplemented, 2),
     OP(0xB9, "LDA", AM::ABSOLUTE_Y, Op::lda, 4),
-    OP(0xBA, "TSX", AM::IMPLICIT, unimplemented, 2),
+    OP(0xBA, "TSX", AM::IMPLICIT, Op::tsx, 2),
     UNSUPPORTED_OP(0xBB, "LAS", AM::ABSOLUTE_Y, 4),
     OP(0xBC, "LDY", AM::ABSOLUTE_X, Op::ldy, 4),
     OP(0xBD, "LDA", AM::ABSOLUTE_X, Op::lda, 4),

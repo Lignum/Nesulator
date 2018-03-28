@@ -5,14 +5,14 @@
 #include "../nes.h"
 #include "../op.h"
 
-#define STx(reg) \
-    unsigned int Op::st##reg(CPU *cpu, Op::Operands &operands, const Op::Opcode *opcode) { \
+#define ST(x) \
+    unsigned int Op::st##x(CPU *cpu, Op::Operands &operands, const Op::Opcode *opcode) { \
         Memory *mem = cpu->getNES()->getMemory(); \
         Address addr = Op::getAddress(cpu, opcode->mode, operands); \
-        mem->write(addr, cpu->getRegs()->reg); \
+        mem->write(addr, cpu->getRegs()->x); \
         return 0; \
     }
 
-STx(a);
-STx(x);
-STx(y);
+ST(a);
+ST(x);
+ST(y);
