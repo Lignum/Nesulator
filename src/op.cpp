@@ -125,7 +125,7 @@ static const Opcode OPCODES[] = {
     /*
      * 0x40 - 0x4F
      */
-    OP(0x40, "RTI", AM::IMPLICIT, unimplemented, 6),
+    OP(0x40, "RTI", AM::IMPLICIT, Op::rti, 6),
     OP(0x41, "EOR", AM::INDEXED_INDIRECT, unimplemented, 6),
     UNSUPPORTED_OP(0x42, "KIL", AM::IMPLICIT, 0),
     UNSUPPORTED_OP(0x43, "SRE", AM::INDEXED_INDIRECT, 8),
