@@ -8,6 +8,7 @@
 #include "op/stores.h"
 #include "op/transfers.h"
 #include "op/flags.h"
+#include "op/control.h"
 #include "utils.h"
 
 #include <vector>
@@ -26,6 +27,10 @@ static unsigned int unsupported(CPU *cpu, Op::Operands &operands, const Op::Opco
     std::cerr << "Opcode $";
     Utils::writeHexToStream(std::cerr, opcode->code);
     std::cerr << " (" << opcode->name << ") is not supported!\n";
+    return 0;
+}
+
+static unsigned int nop(CPU *cpu, Op::Operands &operands, const Op::Opcode *opcode) {
     return 0;
 }
 
@@ -59,7 +64,7 @@ static const Opcode OPCODES[] = {
     /*
      * 0x10 - 0x1F
      */
-    OP(0x10, "BPL", AM::RELATIVE, unimplemented, 2),
+    OP(0x10, "BPL", AM::RELATIVE, Op::bpl, 2),
     OP(0x11, "ORA", AM::INDIRECT_INDEXED, unimplemented, 5),
     UNSUPPORTED_OP(0x12, "KIL", AM::IMPLICIT, 0),
     UNSUPPORTED_OP(0x13, "SLO", AM::INDIRECT_INDEXED, 8),
@@ -99,7 +104,7 @@ static const Opcode OPCODES[] = {
     /*
      * 0x30 - 0x3F
      */
-    OP(0x30, "BMI", AM::RELATIVE, unimplemented, 2),
+    OP(0x30, "BMI", AM::RELATIVE, Op::bmi, 2),
     OP(0x31, "AND", AM::INDIRECT_INDEXED, unimplemented, 5),
     UNSUPPORTED_OP(0x32, "KIL", AM::IMPLICIT, 0),
     UNSUPPORTED_OP(0x33, "RLA", AM::INDIRECT_INDEXED, 8),
@@ -131,7 +136,7 @@ static const Opcode OPCODES[] = {
     OP(0x49, "EOR", AM::IMMEDIATE, unimplemented, 2),
     OP(0x4A, "LSR", AM::ACCUMULATOR, unimplemented, 2),
     UNSUPPORTED_OP(0x4B, "ALR", AM::IMMEDIATE, 2),
-    OP(0x4C, "JMP", AM::ABSOLUTE, unimplemented, 3),
+    OP(0x4C, "JMP", AM::ABSOLUTE, Op::jmp, 3),
     OP(0x4D, "EOR", AM::ABSOLUTE, unimplemented, 4),
     OP(0x4E, "LSR", AM::ABSOLUTE, unimplemented, 6),
     UNSUPPORTED_OP(0x4F, "SRE", AM::ABSOLUTE, 6),
@@ -139,7 +144,7 @@ static const Opcode OPCODES[] = {
     /*
      * 0x50 - 0x5F
      */
-    OP(0x50, "BVC", AM::RELATIVE, unimplemented, 2),
+    OP(0x50, "BVC", AM::RELATIVE, Op::bvc, 2),
     OP(0x51, "EOR", AM::INDIRECT_INDEXED, unimplemented, 5),
     UNSUPPORTED_OP(0x52, "KIL", AM::IMPLICIT, 0),
     UNSUPPORTED_OP(0x53, "SRE", AM::INDEXED_INDIRECT, 0),
@@ -171,7 +176,7 @@ static const Opcode OPCODES[] = {
     OP(0x69, "ADC", AM::IMMEDIATE, unimplemented, 2),
     OP(0x6A, "ROR", AM::ACCUMULATOR, unimplemented, 2),
     UNSUPPORTED_OP(0x6B, "ARR", AM::IMMEDIATE, 2),
-    OP(0x6C, "JMP", AM::INDIRECT, unimplemented, 5),
+    OP(0x6C, "JMP", AM::INDIRECT, Op::jmp, 5),
     OP(0x6D, "ADC", AM::ABSOLUTE, unimplemented, 4),
     OP(0x6E, "ROR", AM::ABSOLUTE, unimplemented, 6),
     UNSUPPORTED_OP(0x6F, "RRA", AM::ABSOLUTE, 6),
@@ -179,7 +184,7 @@ static const Opcode OPCODES[] = {
     /*
      * 0x70 - 0x7F
      */
-    OP(0x70, "BVS", AM::RELATIVE, unimplemented, 2),
+    OP(0x70, "BVS", AM::RELATIVE, Op::bvs, 2),
     OP(0x71, "ADC", AM::INDIRECT_INDEXED, unimplemented, 5),
     UNSUPPORTED_OP(0x72, "KIL", AM::IMPLICIT, 0),
     UNSUPPORTED_OP(0x73, "RRA", AM::INDIRECT_INDEXED, 8),
@@ -219,7 +224,7 @@ static const Opcode OPCODES[] = {
     /*
      * 0x90 - 0x9F
      */
-    OP(0x90, "BCC", AM::RELATIVE, unimplemented, 2),
+    OP(0x90, "BCC", AM::RELATIVE, Op::bcc, 2),
     OP(0x91, "STA", AM::INDIRECT_INDEXED, Op::sta, 6),
     UNSUPPORTED_OP(0x92, "KIL", AM::IMPLICIT, 0),
     UNSUPPORTED_OP(0x93, "AHX", AM::INDIRECT_INDEXED, 6),
@@ -259,7 +264,7 @@ static const Opcode OPCODES[] = {
     /*
      * 0xB0 - 0xBF
      */
-    OP(0xB0, "BCS", AM::RELATIVE, unimplemented, 2),
+    OP(0xB0, "BCS", AM::RELATIVE, Op::bcs, 2),
     OP(0xB1, "LDA", AM::INDIRECT_INDEXED, Op::lda, 5),
     UNSUPPORTED_OP(0xB2, "KIL", AM::IMPLICIT, 0),
     UNSUPPORTED_OP(0xB3, "LAX", AM::INDIRECT_INDEXED, 5),
@@ -299,7 +304,7 @@ static const Opcode OPCODES[] = {
     /*
      * 0xD0 - 0xDF
      */
-    OP(0xD0, "BNE", AM::RELATIVE, unimplemented, 2),
+    OP(0xD0, "BNE", AM::RELATIVE, Op::bne, 2),
     OP(0xD1, "CMP", AM::INDIRECT_INDEXED, unimplemented, 5),
     UNSUPPORTED_OP(0xD2, "KIL", AM::IMPLICIT, 0),
     UNSUPPORTED_OP(0xD3, "DCP", AM::INDIRECT_INDEXED, 8),
@@ -329,7 +334,7 @@ static const Opcode OPCODES[] = {
     UNSUPPORTED_OP(0xE7, "ISC", AM::ZERO_PAGE, 5),
     OP(0xE8, "INX", AM::IMPLICIT, unimplemented, 2),
     OP(0xE9, "SBC", AM::IMMEDIATE, unimplemented, 2),
-    OP(0xEA, "NOP", AM::IMPLICIT, unimplemented, 2),
+    OP(0xEA, "NOP", AM::IMPLICIT, nop, 2),
     UNSUPPORTED_OP(0xEB, "SBC", AM::IMMEDIATE, 2),
     OP(0xEC, "CPX", AM::ABSOLUTE, unimplemented, 4),
     OP(0xED, "SBC", AM::ABSOLUTE, unimplemented, 4),
@@ -339,7 +344,7 @@ static const Opcode OPCODES[] = {
     /*
      * 0xF0 - 0xFF
      */
-    OP(0xF0, "BEQ", AM::RELATIVE, unimplemented, 2),
+    OP(0xF0, "BEQ", AM::RELATIVE, Op::beq, 2),
     OP(0xF1, "SBC", AM::INDIRECT_INDEXED, unimplemented, 5),
     UNSUPPORTED_OP(0xF2, "KIL", AM::IMPLICIT, 0),
     UNSUPPORTED_OP(0xF3, "ISC", AM::INDIRECT_INDEXED, 8),
