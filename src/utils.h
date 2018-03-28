@@ -2,6 +2,7 @@
 
 #include <iosfwd>
 #include <iomanip>
+#include <bitset>
 #include <cstdint>
 
 namespace Utils {
@@ -35,10 +36,6 @@ namespace Utils {
 
     template<typename T>
     void writeBinaryToStream(std::ostream &stream, T x) {
-        size_t size = sizeof(T) * 8;
-
-        for (size_t i = 0; i < size; i++) {
-            stream << (unsigned long)((x >> (size - i - 1)) & 0b1);
-        }
+        stream << std::bitset<sizeof(T) * 8>(x);
     }
 }
