@@ -8,7 +8,7 @@ int main() {
     CPU *cpu = nes.getCPU();
     Memory *mem = nes.getMemory();
 
-    const size_t programSize = 14;
+    const size_t programSize = 16;
 
     // LDA #$6F
     mem->write(0x00, 0xA9);
@@ -59,6 +59,13 @@ int main() {
 
     // LSR A
     mem->write(0x076F, 0x4A);
+
+    // INC $24
+    mem->write(0x0770, 0xE6);
+    mem->write(0x0771, 0x24);
+
+    // DEX
+    mem->write(0x0772, 0xCA);
 
     for (size_t i = 0; i < programSize; i++) {
         cpu->printState();

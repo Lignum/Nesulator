@@ -3,39 +3,65 @@
 #include "../op.h"
 #include "../cpu.h"
 
-#define UNARY(name, f) \
+#define UNARY_MEM_ACC(name, f) \
     unsigned int Op::name(CPU *cpu, Op::Operands &operands, const Op::Opcode *opcode) { \
         uint8_t value = f(cpu, Op::address(cpu, opcode->mode, operands)); \
         Op::setNZFlags(cpu, value); \
         Op::addressWrite(cpu, opcode->mode, operands, value); \
     }
 
-uint8_t computeASL(CPU *cpu, uint8_t x) {
+static uint8_t computeASL(CPU *cpu, uint8_t x) {
     cpu->setFlag(CPUFlag::CARRY, ((x >> 7) & 0b1) == 1);
     return x << 1;
 }
 
-UNARY(asl, computeASL);
+UNARY_MEM_ACC(asl, computeASL);
 
-uint8_t computeLSR(CPU *cpu, uint8_t x) {
+static uint8_t computeLSR(CPU *cpu, uint8_t x) {
     cpu->setFlag(CPUFlag::CARRY, (x & 0b1) == 1);
     return x >> 1;
 }
 
-UNARY(lsr, computeLSR);
+UNARY_MEM_ACC(lsr, computeLSR);
 
-uint8_t computeROL(CPU *cpu, uint8_t x) {
+static uint8_t computeROL(CPU *cpu, uint8_t x) {
     auto bit0 = (uint8_t)(cpu->isFlagSet(CPUFlag::CARRY) ? 1 : 0);
     cpu->setFlag(CPUFlag::CARRY, ((x >> 7) & 0b1) == 1);
     return (x << 1) | bit0;
 }
 
-UNARY(rol, computeROL);
+UNARY_MEM_ACC(rol, computeROL);
 
-uint8_t computeROR(CPU *cpu, uint8_t x) {
+static uint8_t computeROR(CPU *cpu, uint8_t x) {
     auto bit7 = (uint8_t)(cpu->isFlagSet(CPUFlag::CARRY) ? (1 << 7) : 0);
     cpu->setFlag(CPUFlag::CARRY, (x & 0b1) == 1);
     return (x >> 1) | bit7;
 }
 
-UNARY(ror, computeROR);
+UNARY_MEM_ACC(ror, computeROR);
+
+static uint8_t computeINC(CPU *cpu, uint8_t x) {
+    return x + (uint8_t)1;
+}
+
+UNARY_MEM_ACC(inc, computeINC);
+
+static uint8_t computeDEC(CPU *cpu, uint8_t x) {
+    return x - (uint8_t)1;
+}
+
+UNARY_MEM_ACC(dec, computeDEC);
+
+#define UNARY_REG(name, reg, f) \
+    unsigned int Op::name(CPU *cpu, Op::Operands &operands, const Op::Opcode *opcode) { \
+        RegisterFile *r = cpu->getRegs(); \
+        r->reg = f(cpu, r->reg); \
+        Op::setNZFlags(cpu, r->reg); \
+    }
+
+UNARY_REG(inx, x, computeINC);
+UNARY_REG(iny, y, computeINC);
+
+UNARY_REG(dex, x, computeDEC);
+UNARY_REG(dey, y, computeDEC);
+
