@@ -99,5 +99,5 @@ unsigned int Op::bit(CPU *cpu, Op::Operands &operands, const Op::Opcode *opcode)
     Op::setZeroFlag(cpu, a);
     Op::setNegativeFlag(cpu, v);
     cpu->setFlag(CPUFlag::OVERFLOW, ((v >> 6) & 0b1) == 1);
-    return 0; \
+    return 0;
 };
