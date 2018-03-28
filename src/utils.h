@@ -22,4 +22,13 @@ namespace Utils {
     void writeHexToStream(std::ostream &stream, T x) {
         stream << std::uppercase << std::setfill('0') << std::setw((int)(sizeof(T) * 2)) << std::hex << (uint64_t)x;
     }
+
+    template<typename T>
+    void writeBinaryToStream(std::ostream &stream, T x) {
+        size_t size = sizeof(T) * 8;
+
+        for (size_t i = 0; i < size; i++) {
+            stream << (unsigned long)((x >> (size - i - 1)) & 0b1);
+        }
+    }
 }

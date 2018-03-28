@@ -8,11 +8,11 @@ int main() {
     CPU *cpu = nes.getCPU();
     Memory *mem = nes.getMemory();
 
-    const size_t programSize = 4;
+    const size_t programSize = 6;
 
     // LDA #$6F
     mem->write(0x00, 0xA9);
-    mem->write(0x01, 0x6F);
+    mem->write(0x01, 0x80);
 
     // STA $24
     mem->write(0x02, 0x85);
@@ -23,6 +23,12 @@ int main() {
 
     // TAY
     mem->write(0x05, 0xA8);
+
+    // SEI
+    mem->write(0x06, 0x78);
+
+    // CLI
+    mem->write(0x07, 0x58);
 
     for (size_t i = 0; i < programSize; i++) {
         cpu->printState();

@@ -87,10 +87,10 @@ void CPU::printState() const {
     std::cout << ", Y=$";
     Utils::writeHexToStream(std::cout, r.y);
 
-    std::cout << ", P=$";
-    Utils::writeHexToStream(std::cout, r.p);
+    std::cout << ", P=0b";
+    Utils::writeBinaryToStream(std::cout, (uint8_t)r.p);
 
-    std::cout << ", SP=$";
+    std::cout << ", S=$";
     Utils::writeHexToStream(std::cout, r.s);
 
     std::cout << ", PC=$";

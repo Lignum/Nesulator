@@ -7,6 +7,7 @@
 #include "op/loads.h"
 #include "op/stores.h"
 #include "op/transfers.h"
+#include "op/flags.h"
 #include "utils.h"
 
 #include <vector>
@@ -66,7 +67,7 @@ static const Opcode OPCODES[] = {
     OP(0x15, "ORA", AM::ZERO_PAGE_X, unimplemented, 4),
     OP(0x16, "ASL", AM::ZERO_PAGE_X, unimplemented, 6),
     UNSUPPORTED_OP(0x17, "SLO", AM::ZERO_PAGE_X, 6),
-    OP(0x18, "CLC", AM::IMPLICIT, unimplemented, 2),
+    OP(0x18, "CLC", AM::IMPLICIT, Op::clc, 2),
     OP(0x19, "ORA", AM::ABSOLUTE_Y, unimplemented, 4),
     UNSUPPORTED_OP(0x1A, "NOP", AM::IMPLICIT, 2),
     UNSUPPORTED_OP(0x1B, "SLO", AM::ABSOLUTE_Y, 7),
@@ -106,7 +107,7 @@ static const Opcode OPCODES[] = {
     OP(0x35, "AND", AM::ZERO_PAGE_X, unimplemented, 4),
     OP(0x36, "ROL", AM::ZERO_PAGE_X, unimplemented, 6),
     UNSUPPORTED_OP(0x37, "RLA", AM::ZERO_PAGE_X, 6),
-    OP(0x38, "SEC", AM::IMPLICIT, unimplemented, 2),
+    OP(0x38, "SEC", AM::IMPLICIT, Op::sec, 2),
     OP(0x39, "AND", AM::ABSOLUTE_Y, unimplemented, 4),
     UNSUPPORTED_OP(0x3A, "NOP", AM::IMPLICIT, 2),
     UNSUPPORTED_OP(0x3B, "RLA", AM::ABSOLUTE_Y, 7),
@@ -146,7 +147,7 @@ static const Opcode OPCODES[] = {
     OP(0x55, "EOR", AM::ZERO_PAGE_X, unimplemented, 4),
     OP(0x56, "LSR", AM::ZERO_PAGE_X, unimplemented, 6),
     UNSUPPORTED_OP(0x57, "SRE", AM::ZERO_PAGE_X, 6),
-    OP(0x58, "CLI", AM::IMPLICIT, unimplemented, 2),
+    OP(0x58, "CLI", AM::IMPLICIT, Op::cli, 2),
     OP(0x59, "EOR", AM::ABSOLUTE_Y, unimplemented, 4),
     UNSUPPORTED_OP(0x5A, "NOP", AM::IMPLICIT, 2),
     UNSUPPORTED_OP(0x5B, "SRE", AM::ABSOLUTE_Y, 7),
@@ -186,7 +187,7 @@ static const Opcode OPCODES[] = {
     OP(0x75, "ADC", AM::ZERO_PAGE_X, unimplemented, 4),
     OP(0x76, "ROR", AM::ZERO_PAGE_X, unimplemented, 6),
     UNSUPPORTED_OP(0x77, "RRA", AM::ZERO_PAGE_X, 6),
-    OP(0x78, "SEI", AM::IMPLICIT, unimplemented, 2),
+    OP(0x78, "SEI", AM::IMPLICIT, Op::sei, 2),
     OP(0x79, "ADC", AM::ABSOLUTE_Y, unimplemented, 4),
     UNSUPPORTED_OP(0x7A, "NOP", AM::IMPLICIT, 2),
     UNSUPPORTED_OP(0x7B, "RRA", AM::ABSOLUTE_Y, 7),
@@ -266,7 +267,7 @@ static const Opcode OPCODES[] = {
     OP(0xB5, "LDA", AM::ZERO_PAGE_X, Op::lda, 4),
     OP(0xB6, "LDX", AM::ZERO_PAGE_Y, Op::ldx, 4),
     UNSUPPORTED_OP(0xB7, "LAX", AM::ZERO_PAGE_Y, 4),
-    OP(0xB8, "CLV", AM::IMPLICIT, unimplemented, 2),
+    OP(0xB8, "CLV", AM::IMPLICIT, Op::clv, 2),
     OP(0xB9, "LDA", AM::ABSOLUTE_Y, Op::lda, 4),
     OP(0xBA, "TSX", AM::IMPLICIT, Op::tsx, 2),
     UNSUPPORTED_OP(0xBB, "LAS", AM::ABSOLUTE_Y, 4),
@@ -306,7 +307,7 @@ static const Opcode OPCODES[] = {
     OP(0xD5, "CMP", AM::ZERO_PAGE_X, unimplemented, 4),
     OP(0xD6, "DEC", AM::ZERO_PAGE_X, unimplemented, 6),
     UNSUPPORTED_OP(0xD7, "DCP", AM::ZERO_PAGE_X, 6),
-    OP(0xD8, "CLD", AM::IMPLICIT, unimplemented, 2),
+    OP(0xD8, "CLD", AM::IMPLICIT, Op::cld, 2),
     OP(0xD9, "CMP", AM::ABSOLUTE_Y, unimplemented, 4),
     UNSUPPORTED_OP(0xDA, "NOP", AM::IMPLICIT, 2),
     UNSUPPORTED_OP(0xDB, "DCP", AM::ABSOLUTE_Y, 7),
@@ -346,7 +347,7 @@ static const Opcode OPCODES[] = {
     OP(0xF5, "SBC", AM::ZERO_PAGE_X, unimplemented, 4),
     OP(0xF6, "INC", AM::ZERO_PAGE_X, unimplemented, 6),
     UNSUPPORTED_OP(0xF7, "ISC", AM::ZERO_PAGE_X, 6),
-    OP(0xF8, "SED", AM::IMPLICIT, unimplemented, 2),
+    OP(0xF8, "SED", AM::IMPLICIT, Op::sed, 2),
     OP(0xF9, "SBC", AM::ABSOLUTE_Y, unimplemented, 4),
     UNSUPPORTED_OP(0xFA, "NOP", AM::IMPLICIT, 2),
     UNSUPPORTED_OP(0xFB, "ISC", AM::ABSOLUTE_X, 7),
