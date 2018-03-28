@@ -11,9 +11,8 @@ namespace Op {
     typedef const std::vector<uint8_t> Operands;
     typedef unsigned int (*Handler)(CPU *cpu, Operands &operands, const Opcode *opcode);
 
-    enum class AddressingMode {
+    enum class AddressingMode: uint8_t {
         IMPLICIT,
-        ACCUMULATOR,
         IMMEDIATE,
         ZERO_PAGE,
         ZERO_PAGE_X,
@@ -31,6 +30,7 @@ namespace Op {
 
     struct Opcode {
         uint8_t code;
+        unsigned int baseCycles;
         const char name[4];
         AddressingMode mode;
         Handler handler;
