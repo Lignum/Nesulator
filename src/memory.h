@@ -1,13 +1,13 @@
 #pragma once
 
+#include "address.h"
+
 #include <vector>
 #include <cstdint>
 
 extern const size_t NES_INTERNAL_MEMORY_SIZE;
 
 class NES;
-
-typedef uint16_t Address;
 
 class Memory {
 public:

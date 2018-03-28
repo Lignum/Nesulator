@@ -1,5 +1,7 @@
 #pragma once
 
+#include "address.h"
+
 #include <vector>
 #include <string>
 #include <cstdint>
@@ -28,6 +30,8 @@ namespace Op {
     };
 
     size_t getAddressingModeOperandCount(AddressingMode mode);
+
+    Address getAddress(CPU *cpu, AddressingMode mode, const Operands &operands);
 
     uint8_t address(CPU *cpu, AddressingMode mode, const Operands &operands);
 

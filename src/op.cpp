@@ -5,6 +5,7 @@
 #include "memory.h"
 #include "op/irq.h"
 #include "op/loads.h"
+#include "op/stores.h"
 #include "utils.h"
 
 #include <vector>
@@ -197,39 +198,39 @@ static const Opcode OPCODES[] = {
      * 0x80 - 0x8F
      */
     UNSUPPORTED_OP(0x80, "NOP", AM::IMMEDIATE, 2),
-    OP(0x81, "STA", AM::INDEXED_INDIRECT, unimplemented, 6),
+    OP(0x81, "STA", AM::INDEXED_INDIRECT, Op::sta, 6),
     UNSUPPORTED_OP(0x82, "NOP", AM::IMMEDIATE, 2),
     UNSUPPORTED_OP(0x83, "SAX", AM::INDEXED_INDIRECT, 6),
-    OP(0x84, "STY", AM::ZERO_PAGE, unimplemented, 3),
-    OP(0x85, "STA", AM::ZERO_PAGE, unimplemented, 3),
-    OP(0x86, "STX", AM::ZERO_PAGE, unimplemented, 3),
+    OP(0x84, "STY", AM::ZERO_PAGE, Op::sty, 3),
+    OP(0x85, "STA", AM::ZERO_PAGE, Op::sta, 3),
+    OP(0x86, "STX", AM::ZERO_PAGE, Op::stx, 3),
     UNSUPPORTED_OP(0x87, "SAX", AM::ZERO_PAGE, 3),
     OP(0x88, "DEY", AM::IMPLICIT, unimplemented, 2),
     UNSUPPORTED_OP(0x89, "NOP", AM::IMMEDIATE, 2),
     OP(0x8A, "TXA", AM::IMPLICIT, unimplemented, 2),
     UNSUPPORTED_OP(0x8B, "XAA", AM::IMMEDIATE, 2),
-    OP(0x8C, "STY", AM::ABSOLUTE, unimplemented, 4),
-    OP(0x8D, "STA", AM::ABSOLUTE, unimplemented, 4),
-    OP(0x8E, "STX", AM::ABSOLUTE, unimplemented, 4),
+    OP(0x8C, "STY", AM::ABSOLUTE, Op::sty, 4),
+    OP(0x8D, "STA", AM::ABSOLUTE, Op::sta, 4),
+    OP(0x8E, "STX", AM::ABSOLUTE, Op::stx, 4),
     UNSUPPORTED_OP(0x8F, "SAX", AM::ABSOLUTE, 4),
 
     /*
      * 0x90 - 0x9F
      */
     OP(0x90, "BCC", AM::RELATIVE, unimplemented, 2),
-    OP(0x91, "STA", AM::INDIRECT_INDEXED, unimplemented, 6),
+    OP(0x91, "STA", AM::INDIRECT_INDEXED, Op::sta, 6),
     UNSUPPORTED_OP(0x92, "KIL", AM::IMPLICIT, 0),
     UNSUPPORTED_OP(0x93, "AHX", AM::INDIRECT_INDEXED, 6),
-    OP(0x94, "STY", AM::ZERO_PAGE_X, unimplemented, 4),
-    OP(0x95, "STA", AM::ZERO_PAGE_X, unimplemented, 4),
-    OP(0x96, "STX", AM::ZERO_PAGE_Y, unimplemented, 4),
+    OP(0x94, "STY", AM::ZERO_PAGE_X, Op::sty, 4),
+    OP(0x95, "STA", AM::ZERO_PAGE_X, Op::sta, 4),
+    OP(0x96, "STX", AM::ZERO_PAGE_Y, Op::stx, 4),
     UNSUPPORTED_OP(0x97, "SAX", AM::ZERO_PAGE_Y, 4),
     OP(0x98, "TYA", AM::IMPLICIT, unimplemented, 2),
-    OP(0x99, "STA", AM::ABSOLUTE_Y, unimplemented, 5),
+    OP(0x99, "STA", AM::ABSOLUTE_Y, Op::sta, 5),
     OP(0x9A, "TXS", AM::IMPLICIT, unimplemented, 2),
     UNSUPPORTED_OP(0x9B, "TAS", AM::ABSOLUTE_Y, 5),
     UNSUPPORTED_OP(0x9C, "SHY", AM::ABSOLUTE_X, 5),
-    OP(0x9D, "STA", AM::ABSOLUTE_X, unimplemented, 5),
+    OP(0x9D, "STA", AM::ABSOLUTE_X, Op::sta, 5),
     UNSUPPORTED_OP(0x9E, "SHX", AM::ABSOLUTE_Y, 5),
     UNSUPPORTED_OP(0x9F, "AHX", AM::ABSOLUTE_Y, 5),
 
@@ -381,7 +382,6 @@ size_t Op::getAddressingModeOperandCount(Op::AddressingMode mode) {
 }
 
 uint8_t Op::address(CPU *cpu, Op::AddressingMode mode, const Op::Operands &operands) {
-    RegisterFile *r = cpu->getRegs();
     Memory *mem = cpu->getNES()->getMemory();
 
     switch (mode) {
@@ -391,27 +391,53 @@ uint8_t Op::address(CPU *cpu, Op::AddressingMode mode, const Op::Operands &opera
         case AM::IMMEDIATE:
             return operands[0];
 
+        default:
+            return mem->read(getAddress(cpu, mode, operands));
+    }
+}
+
+Address Op::getAddress(CPU *cpu, Op::AddressingMode mode, const Op::Operands &operands) {
+    RegisterFile *r = cpu->getRegs();
+    Memory *mem = cpu->getNES()->getMemory();
+
+    switch (mode) {
+        case AM::IMPLICIT:
+        case AM::IMMEDIATE:
+            return 0;
+
         case AM::ZERO_PAGE:
-            return mem->read((Address)operands[0]);
+            return (Address)operands[0];
 
         case AM::ZERO_PAGE_X:
-            return mem->read((Address)(operands[0] + r->x));
+            return (Address)(operands[0] + r->x);
 
         case AM::ZERO_PAGE_Y:
-            return mem->read((Address)(operands[0] + r->y));
+            return (Address)(operands[0] + r->y);
 
         case AM::ABSOLUTE:
-            return mem->read(Utils::combineUint8sLE(operands[1], operands[0]));
+            return Utils::combineUint8sLE(operands[0], operands[1]);
 
         case AM::ABSOLUTE_X:
-            return mem->read(Utils::combineUint8sLE(operands[1], operands[0]) + r->x);
+            return Utils::combineUint8sLE(operands[0], operands[1]) + r->x;
 
         case AM::ABSOLUTE_Y:
-            return mem->read(Utils::combineUint8sLE(operands[1], operands[0]) + r->y);
+            return Utils::combineUint8sLE(operands[0], operands[1]) + r->y;
 
-        default:
-            // TODO: Implement.
-            return 0;
+        case AM::RELATIVE:
+            return r->pc + (int8_t)operands[0];
+
+        case AM::INDIRECT: {
+            Address addrAddr = Utils::combineUint8sLE(operands[0], operands[1]);
+            return Utils::combineUint8sLE(mem->read(addrAddr), mem->read(addrAddr + (Address)1));
+        }
+
+        case AM::INDEXED_INDIRECT:
+            return mem->read((Address)(operands[0] + r->x));
+
+        case AM::INDIRECT_INDEXED: {
+            Address addrAddr = mem->read(operands[0]) + r->y;
+            return Utils::combineUint8sLE(mem->read(addrAddr), mem->read(addrAddr + (Address)1));
+        }
     }
 }
 

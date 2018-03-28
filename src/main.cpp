@@ -1,25 +1,32 @@
 #include "nes.h"
+#include "utils.h"
+
+#include <iostream>
 
 int main() {
     NES nes;
-    nes.getMemory()->write(0x00, 0xA9);
-    nes.getMemory()->write(0x01, 0x6F);
+    CPU *cpu = nes.getCPU();
+    Memory *mem = nes.getMemory();
 
-    nes.getMemory()->write(0x02, 0xA2);
-    nes.getMemory()->write(0x03, 0x01);
+    const size_t programSize = 2;
 
-    nes.getMemory()->write(0x04, 0xB5);
-    nes.getMemory()->write(0x05, 0x6F);
+    // LDA #$6F
+    mem->write(0x00, 0xA9);
+    mem->write(0x01, 0x6F);
 
-    nes.getMemory()->write(0x6F, 0xAB);
-    nes.getMemory()->write(0x70, 0xCD);
+    // STA $24
+    mem->write(0x02, 0x85);
+    mem->write(0x03, 0x24);
 
-    nes.getCPU()->printState();
-    nes.getCPU()->step();
-    nes.getCPU()->printState();
-    nes.getCPU()->step();
-    nes.getCPU()->printState();
-    nes.getCPU()->step();
-    nes.getCPU()->printState();
+    for (size_t i = 0; i < programSize; i++) {
+        cpu->printState();
+        cpu->step();
+    }
+
+    cpu->printState();
+
+    std::cout << "$0024: $";
+    Utils::writeHexToStream(std::cout, mem->read(0x0024));
+    std::cout << "\n";
     return 0;
 }
