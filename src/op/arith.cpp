@@ -90,7 +90,23 @@ static uint8_t computeEOR(CPU *cpu, uint8_t a, uint8_t b) {
     return a ^ b;
 }
 
-BINARY(eor, a, computeEOR)
+BINARY(eor, a, computeEOR);
+
+static uint8_t computeADC(CPU *cpu, uint8_t a, uint8_t b) {
+    const auto carry = (uint8_t)(cpu->isFlagSet(CPUFlag::CARRY) ? 1 : 0);
+    const uint16_t sum = a + b + carry;
+    cpu->setFlag(CPUFlag::CARRY, sum > 0xFF);
+    cpu->setFlag(CPUFlag::OVERFLOW, (~(a ^ b) & (a ^ sum) & (1 << 7)) > 0); // https://stackoverflow.com/a/29224684
+    return (uint8_t)sum;
+}
+
+BINARY(adc, a, computeADC);
+
+static uint8_t computeSBC(CPU *cpu, uint8_t a, uint8_t b) {
+    return computeADC(cpu, a, ~b + (uint8_t)1);
+}
+
+BINARY(sbc, a, computeSBC);
 
 unsigned int Op::bit(CPU *cpu, Op::Operands &operands, const Op::Opcode *opcode) {
     RegisterFile *r = cpu->getRegs();

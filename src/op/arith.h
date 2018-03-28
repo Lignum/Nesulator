@@ -31,4 +31,8 @@ namespace Op {
     unsigned int eor(CPU *cpu, Op::Operands &operands, const Op::Opcode *opcode);
 
     unsigned int bit(CPU *cpu, Op::Operands &operands, const Op::Opcode *opcode);
+
+    unsigned int adc(CPU *cpu, Op::Operands &operands, const Op::Opcode *opcode);
+
+    unsigned int sbc(CPU *cpu, Op::Operands &operands, const Op::Opcode *opcode);
 }
