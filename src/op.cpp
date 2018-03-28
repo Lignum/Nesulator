@@ -85,7 +85,7 @@ static const Opcode OPCODES[] = {
     /*
      * 0x20 - 0x2F
      */
-    OP(0x20, "JSR", AM::ABSOLUTE, unimplemented, 6),
+    OP(0x20, "JSR", AM::ABSOLUTE, Op::jsr, 6),
     OP(0x21, "AND", AM::INDEXED_INDIRECT, unimplemented, 6),
     UNSUPPORTED_OP(0x22, "KIL", AM::IMPLICIT, 0),
     UNSUPPORTED_OP(0x23, "RLA", AM::INDEXED_INDIRECT, 8),
@@ -165,7 +165,7 @@ static const Opcode OPCODES[] = {
     /*
      * 0x60 - 0x6F
      */
-    OP(0x60, "RTS", AM::IMPLICIT, unimplemented, 6),
+    OP(0x60, "RTS", AM::IMPLICIT, Op::rts, 6),
     OP(0x61, "ADC", AM::INDIRECT_INDEXED, unimplemented, 6),
     UNSUPPORTED_OP(0x62, "KIL", AM::IMPLICIT, 0),
     UNSUPPORTED_OP(0x63, "RRA", AM::INDEXED_INDIRECT, 8),

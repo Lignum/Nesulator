@@ -20,4 +20,8 @@ namespace Op {
     unsigned int bvc(CPU *cpu, Op::Operands &operands, const Op::Opcode *opcode);
 
     unsigned int bvs(CPU *cpu, Op::Operands &operands, const Op::Opcode *opcode);
+
+    unsigned int jsr(CPU *cpu, Op::Operands &operands, const Op::Opcode *opcode);
+
+    unsigned int rts(CPU *cpu, Op::Operands &operands, const Op::Opcode *opcode);
 }
