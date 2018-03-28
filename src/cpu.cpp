@@ -34,11 +34,7 @@ bool CPU::isFlagSet(CPUFlag flag) const {
 }
 
 void CPU::setFlag(CPUFlag flag, bool set) {
-    if (set) {
-        r.p = (CPUFlag)((uint8_t)r.p | (uint8_t)flag);
-    } else {
-        r.p = (CPUFlag)((uint8_t)r.p & ~(uint8_t)flag);
-    }
+    r.p = (CPUFlag)(set ? (uint8_t)r.p | (uint8_t)flag : (uint8_t)r.p & ~(uint8_t)flag);
 }
 
 unsigned int CPU::step() {
