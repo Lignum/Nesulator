@@ -8,17 +8,21 @@
 #include "utils.h"
 
 #include <vector>
-#include <cstdio>
 #include <sstream>
 #include <iomanip>
+#include <iostream>
 
 static unsigned int unimplemented(CPU *cpu, Op::Operands &operands, const Op::Opcode *opcode) {
-    fprintf(stderr, "Opcode 0x%02X (%s) has not been implemented yet!\n", opcode->code, opcode->name);
+    std::cerr << "Opcode $";
+    Utils::writeHexToStream(std::cerr, opcode->code);
+    std::cerr << " (" << opcode->name << ") has not been implemented yet!\n";
     return 0;
 }
 
 static unsigned int unsupported(CPU *cpu, Op::Operands &operands, const Op::Opcode *opcode) {
-    fprintf(stderr, "Opcode 0x%02X (%s) is not supported!\n", opcode->code, opcode->name);
+    std::cerr << "Opcode $";
+    Utils::writeHexToStream(std::cerr, opcode->code);
+    std::cerr << " (" << opcode->name << ") is not supported!\n";
     return 0;
 }
 
@@ -424,11 +428,6 @@ void Op::setNZFlags(CPU *cpu, uint8_t value) {
     setZeroFlag(cpu, value);
 }
 
-template<typename T>
-static void writeHexToSS(std::ostringstream &stream, T x) {
-    stream << std::uppercase << std::setfill('0') << std::setw((int)(sizeof(T) * 2)) << std::hex << (size_t)x;
-}
-
 void Op::formatInstruction(const Opcode *opcode, const Op::Operands &operands, std::string *outFormatted) {
     if (!outFormatted) {
         return;
@@ -443,58 +442,58 @@ void Op::formatInstruction(const Opcode *opcode, const Op::Operands &operands, s
 
         case AM::IMMEDIATE:
             stream << " #$";
-            writeHexToSS(stream, operands[0]);
+            Utils::writeHexToStream(stream, operands[0]);
             break;
 
         case AM::ZERO_PAGE:
             stream << " $";
-            writeHexToSS(stream, operands[0]);
+            Utils::writeHexToStream(stream, operands[0]);
             break;
 
         case AM::ZERO_PAGE_X:
             stream << " $";
-            writeHexToSS(stream, operands[0]);
+            Utils::writeHexToStream(stream, operands[0]);
             stream << ", X";
             break;
 
         case AM::ZERO_PAGE_Y:
             stream << " $";
-            writeHexToSS(stream, operands[0]);
+            Utils::writeHexToStream(stream, operands[0]);
             stream << ", Y";
             break;
 
         case AM::INDEXED_INDIRECT:
             stream << " ($";
-            writeHexToSS(stream, operands[0]);
+            Utils::writeHexToStream(stream, operands[0]);
             stream << ", X)";
             break;
 
         case AM::INDIRECT_INDEXED:
             stream << " ($";
-            writeHexToSS(stream, operands[0]);
+            Utils::writeHexToStream(stream, operands[0]);
             stream << "), Y";
             break;
 
         case AM::ABSOLUTE:
             stream << " $";
-            writeHexToSS(stream, Utils::combineUint8sLE(operands[0], operands[1]));
+            Utils::writeHexToStream(stream, Utils::combineUint8sLE(operands[0], operands[1]));
             break;
 
         case AM::ABSOLUTE_X:
             stream << " $";
-            writeHexToSS(stream, Utils::combineUint8sLE(operands[0], operands[1]));
+            Utils::writeHexToStream(stream, Utils::combineUint8sLE(operands[0], operands[1]));
             stream << ", X";
             break;
 
         case AM::ABSOLUTE_Y:
             stream << " $";
-            writeHexToSS(stream, Utils::combineUint8sLE(operands[0], operands[1]));
+            Utils::writeHexToStream(stream, Utils::combineUint8sLE(operands[0], operands[1]));
             stream << ", Y";
             break;
 
         case AM::INDIRECT:
             stream << " ($";
-            writeHexToSS(stream, Utils::combineUint8sLE(operands[0], operands[1]));
+            Utils::writeHexToStream(stream, Utils::combineUint8sLE(operands[0], operands[1]));
             stream << ")";
             break;
 

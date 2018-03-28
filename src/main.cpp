@@ -1,10 +1,8 @@
 #include "nes.h"
 
-#include <cstdio>
-
 int main() {
     NES nes;
-    nes.getMemory()->write(0x00, 0xB5);
+    nes.getMemory()->write(0x00, 0xA9);
     nes.getMemory()->write(0x01, 0x6F);
 
     nes.getMemory()->write(0x02, 0xA2);
@@ -23,6 +21,5 @@ int main() {
     nes.getCPU()->printState();
     nes.getCPU()->step();
     nes.getCPU()->printState();
-
     return 0;
 }

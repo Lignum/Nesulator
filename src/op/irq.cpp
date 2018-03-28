@@ -1,8 +1,8 @@
 #include "irq.h"
 
-#include <cstdio>
+#include <iostream>
 
 unsigned int Op::brk(CPU *cpu, Op::Operands &operands, const Op::Opcode *opcode) {
-    printf("Hit a BRK\n");
+    std::cout << "Hit a BRK\n";
     return 0;
 }

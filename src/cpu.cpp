@@ -2,11 +2,11 @@
 
 #include "nes.h"
 #include "op.h"
+#include "utils.h"
 
 #include <vector>
 #include <string>
 #include <iostream>
-#include <cstdio>
 
 CPU::CPU(NES *nes)
     : nes(nes),
@@ -46,7 +46,9 @@ unsigned int CPU::step() {
     const Op::Opcode *opDecoded = Op::decode(op);
 
     if (opDecoded == nullptr) {
-        fprintf(stderr, "0x%02X was not a valid opcode!", op);
+        std::cerr << "$";
+        Utils::writeHexToStream(std::cerr, op);
+        std::cerr << " was not a valid opcode!\n";
         return 0;
     }
 
@@ -80,5 +82,23 @@ void CPU::fetchOperands(size_t count, std::vector<uint8_t> &operands) {
 }
 
 void CPU::printState() const {
-    printf("A=$%02X, X=$%02X, Y=$%02X, P=$%02X, SP=$%02X, PC=$%04X\n", r.a, r.x, r.y, r.p, r.sp, r.pc);
+    std::cout << "A=$";
+    Utils::writeHexToStream(std::cout, r.a);
+
+    std::cout << ", X=$";
+    Utils::writeHexToStream(std::cout, r.x);
+
+    std::cout << ", Y=$";
+    Utils::writeHexToStream(std::cout, r.y);
+
+    std::cout << ", P=$";
+    Utils::writeHexToStream(std::cout, r.p);
+
+    std::cout << ", SP=$";
+    Utils::writeHexToStream(std::cout, r.sp);
+
+    std::cout << ", PC=$";
+    Utils::writeHexToStream(std::cout, r.pc);
+
+    std::cout << "\n";
 }
