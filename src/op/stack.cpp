@@ -14,7 +14,9 @@ unsigned int Op::php(CPU *cpu, Op::Operands &operands, const Op::Opcode *opcode)
 }
 
 unsigned int Op::pla(CPU *cpu, Op::Operands &operands, const Op::Opcode *opcode) {
-    cpu->getRegs()->a = cpu->pull();
+    uint8_t a = cpu->pull();
+    cpu->getRegs()->a = a;
+    Op::setNZFlags(cpu, a);
     return 0;
 }
 
