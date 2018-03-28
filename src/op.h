@@ -36,6 +36,8 @@ namespace Op {
 
     uint8_t address(CPU *cpu, AddressingMode mode, const Operands &operands);
 
+    void addressWrite(CPU *cpu, AddressingMode mode, const Operands &operands, uint8_t value);
+
     void setNegativeFlag(CPU *cpu, uint8_t value);
 
     void setZeroFlag(CPU *cpu, uint8_t value);

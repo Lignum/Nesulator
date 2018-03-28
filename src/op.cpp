@@ -10,6 +10,7 @@
 #include "op/flags.h"
 #include "op/control.h"
 #include "op/stack.h"
+#include "op/arith.h"
 #include "utils.h"
 
 #include <vector>
@@ -51,15 +52,15 @@ static const Opcode OPCODES[] = {
     UNSUPPORTED_OP(0x03, "SLO", AM::INDEXED_INDIRECT, 8),
     UNSUPPORTED_OP(0x04, "NOP", AM::ZERO_PAGE, 3),
     OP(0x05, "ORA", AM::ZERO_PAGE, unimplemented, 3),
-    OP(0x06, "ASL", AM::ZERO_PAGE, unimplemented, 5),
+    OP(0x06, "ASL", AM::ZERO_PAGE, Op::asl, 5),
     UNSUPPORTED_OP(0x07, "SLO", AM::ZERO_PAGE, 5),
     OP(0x08, "PHP", AM::IMPLICIT, Op::php, 3),
     OP(0x09, "ORA", AM::IMMEDIATE, unimplemented, 2),
-    OP(0x0A, "ASL", AM::ACCUMULATOR, unimplemented, 2),
+    OP(0x0A, "ASL", AM::ACCUMULATOR, Op::asl, 2),
     UNSUPPORTED_OP(0x0B, "ANC", AM::IMMEDIATE, 2),
     UNSUPPORTED_OP(0x0C, "NOP", AM::ABSOLUTE, 4),
     OP(0x0D, "ORA", AM::ABSOLUTE, unimplemented, 4),
-    OP(0x0E, "ASL", AM::ABSOLUTE, unimplemented, 6),
+    OP(0x0E, "ASL", AM::ABSOLUTE, Op::asl, 6),
     UNSUPPORTED_OP(0x0F, "SLO", AM::ABSOLUTE, 6),
 
     /*
@@ -71,7 +72,7 @@ static const Opcode OPCODES[] = {
     UNSUPPORTED_OP(0x13, "SLO", AM::INDIRECT_INDEXED, 8),
     UNSUPPORTED_OP(0x14, "NOP", AM::ZERO_PAGE_X, 4),
     OP(0x15, "ORA", AM::ZERO_PAGE_X, unimplemented, 4),
-    OP(0x16, "ASL", AM::ZERO_PAGE_X, unimplemented, 6),
+    OP(0x16, "ASL", AM::ZERO_PAGE_X, Op::asl, 6),
     UNSUPPORTED_OP(0x17, "SLO", AM::ZERO_PAGE_X, 6),
     OP(0x18, "CLC", AM::IMPLICIT, Op::clc, 2),
     OP(0x19, "ORA", AM::ABSOLUTE_Y, unimplemented, 4),
@@ -79,7 +80,7 @@ static const Opcode OPCODES[] = {
     UNSUPPORTED_OP(0x1B, "SLO", AM::ABSOLUTE_Y, 7),
     UNSUPPORTED_OP(0x1C, "NOP", AM::ABSOLUTE_X, 4),
     OP(0x1D, "ORA", AM::ABSOLUTE_X, unimplemented, 4),
-    OP(0x1E, "ASL", AM::ABSOLUTE_X, unimplemented, 7),
+    OP(0x1E, "ASL", AM::ABSOLUTE_X, Op::asl, 7),
     UNSUPPORTED_OP(0x1F, "SLO", AM::ABSOLUTE_X, 7),
 
     /*
@@ -91,15 +92,15 @@ static const Opcode OPCODES[] = {
     UNSUPPORTED_OP(0x23, "RLA", AM::INDEXED_INDIRECT, 8),
     OP(0x24, "BIT", AM::ZERO_PAGE, unimplemented, 3),
     OP(0x25, "AND", AM::ZERO_PAGE, unimplemented, 3),
-    OP(0x26, "ROL", AM::ZERO_PAGE, unimplemented, 5),
+    OP(0x26, "ROL", AM::ZERO_PAGE, Op::rol, 5),
     UNSUPPORTED_OP(0x27, "RLA", AM::ZERO_PAGE, 5),
     OP(0x28, "PLP", AM::IMPLICIT, Op::plp, 4),
     OP(0x29, "AND", AM::IMMEDIATE, unimplemented, 2),
-    OP(0x2A, "ROL", AM::ACCUMULATOR, unimplemented, 2),
+    OP(0x2A, "ROL", AM::ACCUMULATOR, Op::rol, 2),
     UNSUPPORTED_OP(0x2B, "ANC", AM::IMMEDIATE, 2),
     OP(0x2C, "BIT", AM::ABSOLUTE, unimplemented, 4),
     OP(0x2D, "AND", AM::ABSOLUTE, unimplemented, 4),
-    OP(0x2E, "ROL", AM::ABSOLUTE, unimplemented, 6),
+    OP(0x2E, "ROL", AM::ABSOLUTE, Op::rol, 6),
     UNSUPPORTED_OP(0x2F, "RLA", AM::ABSOLUTE, 6),
 
     /*
@@ -111,7 +112,7 @@ static const Opcode OPCODES[] = {
     UNSUPPORTED_OP(0x33, "RLA", AM::INDIRECT_INDEXED, 8),
     UNSUPPORTED_OP(0x34, "NOP", AM::ZERO_PAGE_X, 4),
     OP(0x35, "AND", AM::ZERO_PAGE_X, unimplemented, 4),
-    OP(0x36, "ROL", AM::ZERO_PAGE_X, unimplemented, 6),
+    OP(0x36, "ROL", AM::ZERO_PAGE_X, Op::rol, 6),
     UNSUPPORTED_OP(0x37, "RLA", AM::ZERO_PAGE_X, 6),
     OP(0x38, "SEC", AM::IMPLICIT, Op::sec, 2),
     OP(0x39, "AND", AM::ABSOLUTE_Y, unimplemented, 4),
@@ -119,7 +120,7 @@ static const Opcode OPCODES[] = {
     UNSUPPORTED_OP(0x3B, "RLA", AM::ABSOLUTE_Y, 7),
     UNSUPPORTED_OP(0x3C, "NOP", AM::ABSOLUTE_X, 4),
     OP(0x3D, "AND", AM::ABSOLUTE, unimplemented, 4),
-    OP(0x3E, "ROL", AM::ABSOLUTE_X, unimplemented, 7),
+    OP(0x3E, "ROL", AM::ABSOLUTE_X, Op::rol, 7),
     UNSUPPORTED_OP(0x3F, "RLA", AM::ABSOLUTE_X, 7),
 
     /*
@@ -131,15 +132,15 @@ static const Opcode OPCODES[] = {
     UNSUPPORTED_OP(0x43, "SRE", AM::INDEXED_INDIRECT, 8),
     UNSUPPORTED_OP(0x44, "NOP", AM::ZERO_PAGE, 3),
     OP(0x45, "EOR", AM::ZERO_PAGE, unimplemented, 3),
-    OP(0x46, "LSR", AM::ZERO_PAGE, unimplemented, 5),
+    OP(0x46, "LSR", AM::ZERO_PAGE, Op::lsr, 5),
     UNSUPPORTED_OP(0x47, "SRE", AM::ZERO_PAGE, 5),
     OP(0x48, "PHA", AM::IMPLICIT, Op::pha, 3),
     OP(0x49, "EOR", AM::IMMEDIATE, unimplemented, 2),
-    OP(0x4A, "LSR", AM::ACCUMULATOR, unimplemented, 2),
+    OP(0x4A, "LSR", AM::ACCUMULATOR, Op::lsr, 2),
     UNSUPPORTED_OP(0x4B, "ALR", AM::IMMEDIATE, 2),
     OP(0x4C, "JMP", AM::ABSOLUTE, Op::jmp, 3),
     OP(0x4D, "EOR", AM::ABSOLUTE, unimplemented, 4),
-    OP(0x4E, "LSR", AM::ABSOLUTE, unimplemented, 6),
+    OP(0x4E, "LSR", AM::ABSOLUTE, Op::lsr, 6),
     UNSUPPORTED_OP(0x4F, "SRE", AM::ABSOLUTE, 6),
 
     /*
@@ -151,7 +152,7 @@ static const Opcode OPCODES[] = {
     UNSUPPORTED_OP(0x53, "SRE", AM::INDEXED_INDIRECT, 0),
     UNSUPPORTED_OP(0x54, "NOP", AM::ZERO_PAGE_X, 4),
     OP(0x55, "EOR", AM::ZERO_PAGE_X, unimplemented, 4),
-    OP(0x56, "LSR", AM::ZERO_PAGE_X, unimplemented, 6),
+    OP(0x56, "LSR", AM::ZERO_PAGE_X, Op::lsr, 6),
     UNSUPPORTED_OP(0x57, "SRE", AM::ZERO_PAGE_X, 6),
     OP(0x58, "CLI", AM::IMPLICIT, Op::cli, 2),
     OP(0x59, "EOR", AM::ABSOLUTE_Y, unimplemented, 4),
@@ -159,7 +160,7 @@ static const Opcode OPCODES[] = {
     UNSUPPORTED_OP(0x5B, "SRE", AM::ABSOLUTE_Y, 7),
     UNSUPPORTED_OP(0x5C, "NOP", AM::ABSOLUTE_X, 4),
     OP(0x5D, "EOR", AM::ABSOLUTE_X, unimplemented, 4),
-    OP(0x5E, "LSR", AM::ABSOLUTE_X, unimplemented, 7),
+    OP(0x5E, "LSR", AM::ABSOLUTE_X, Op::lsr, 7),
     UNSUPPORTED_OP(0x5F, "SRE", AM::ABSOLUTE_X, 7),
 
     /*
@@ -171,15 +172,15 @@ static const Opcode OPCODES[] = {
     UNSUPPORTED_OP(0x63, "RRA", AM::INDEXED_INDIRECT, 8),
     UNSUPPORTED_OP(0x64, "NOP", AM::ZERO_PAGE, 3),
     OP(0x65, "ADC", AM::ZERO_PAGE, unimplemented, 3),
-    OP(0x66, "ROR", AM::ZERO_PAGE, unimplemented, 5),
+    OP(0x66, "ROR", AM::ZERO_PAGE, Op::ror, 5),
     UNSUPPORTED_OP(0x67, "RRA", AM::ZERO_PAGE, 5),
     OP(0x68, "PLA", AM::IMPLICIT, Op::pla, 4),
     OP(0x69, "ADC", AM::IMMEDIATE, unimplemented, 2),
-    OP(0x6A, "ROR", AM::ACCUMULATOR, unimplemented, 2),
+    OP(0x6A, "ROR", AM::ACCUMULATOR, Op::ror, 2),
     UNSUPPORTED_OP(0x6B, "ARR", AM::IMMEDIATE, 2),
     OP(0x6C, "JMP", AM::INDIRECT, Op::jmp, 5),
     OP(0x6D, "ADC", AM::ABSOLUTE, unimplemented, 4),
-    OP(0x6E, "ROR", AM::ABSOLUTE, unimplemented, 6),
+    OP(0x6E, "ROR", AM::ABSOLUTE, Op::ror, 6),
     UNSUPPORTED_OP(0x6F, "RRA", AM::ABSOLUTE, 6),
 
     /*
@@ -191,7 +192,7 @@ static const Opcode OPCODES[] = {
     UNSUPPORTED_OP(0x73, "RRA", AM::INDIRECT_INDEXED, 8),
     UNSUPPORTED_OP(0x74, "NOP", AM::ZERO_PAGE_X, 4),
     OP(0x75, "ADC", AM::ZERO_PAGE_X, unimplemented, 4),
-    OP(0x76, "ROR", AM::ZERO_PAGE_X, unimplemented, 6),
+    OP(0x76, "ROR", AM::ZERO_PAGE_X, Op::ror, 6),
     UNSUPPORTED_OP(0x77, "RRA", AM::ZERO_PAGE_X, 6),
     OP(0x78, "SEI", AM::IMPLICIT, Op::sei, 2),
     OP(0x79, "ADC", AM::ABSOLUTE_Y, unimplemented, 4),
@@ -199,7 +200,7 @@ static const Opcode OPCODES[] = {
     UNSUPPORTED_OP(0x7B, "RRA", AM::ABSOLUTE_Y, 7),
     UNSUPPORTED_OP(0x7C, "NOP", AM::ABSOLUTE_X, 4),
     OP(0x7D, "ADC", AM::ABSOLUTE_X, unimplemented, 4),
-    OP(0x7E, "ROR", AM::ABSOLUTE_X, unimplemented, 7),
+    OP(0x7E, "ROR", AM::ABSOLUTE_X, Op::ror, 7),
     UNSUPPORTED_OP(0x7F, "RRA", AM::ABSOLUTE_X, 7),
 
     /*
@@ -408,6 +409,26 @@ uint8_t Op::address(CPU *cpu, Op::AddressingMode mode, const Op::Operands &opera
             return mem->read(getAddress(cpu, mode, operands));
     }
 }
+
+void Op::addressWrite(CPU *cpu, Op::AddressingMode mode, const Op::Operands &operands, uint8_t value) {
+    RegisterFile *r = cpu->getRegs();
+    Memory *mem = cpu->getNES()->getMemory();
+
+    switch (mode) {
+        case AM::IMPLICIT:
+        case AM::IMMEDIATE:
+            return;
+
+        case AM::ACCUMULATOR:
+            r->a = value;
+            break;
+
+        default:
+            mem->write(getAddress(cpu, mode, operands), value);
+            break;
+    }
+}
+
 
 Address Op::getAddress(CPU *cpu, Op::AddressingMode mode, const Op::Operands &operands) {
     const RegisterFile *r = cpu->getRegs();
