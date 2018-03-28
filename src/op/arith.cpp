@@ -116,4 +116,18 @@ unsigned int Op::bit(CPU *cpu, Op::Operands &operands, const Op::Opcode *opcode)
     Op::setNegativeFlag(cpu, v);
     cpu->setFlag(CPUFlag::OVERFLOW, ((v >> 6) & 0b1) == 1);
     return 0;
-};
+}
+
+#define CMP(name, reg) \
+    unsigned int Op::name(CPU *cpu, Op::Operands &operands, const Op::Opcode *opcode) { \
+        RegisterFile *r = cpu->getRegs(); \
+        const uint8_t v = Op::address(cpu, opcode->mode, operands); \
+        cpu->setFlag(CPUFlag::CARRY, r->reg >= v); \
+        cpu->setFlag(CPUFlag::ZERO, r->reg == v); \
+        Op::setNegativeFlag(cpu, r->reg - v); \
+        return 0; \
+    }
+
+CMP(cmp, a);
+CMP(cpx, x);
+CMP(cpy, y);

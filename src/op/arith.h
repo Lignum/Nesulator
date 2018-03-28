@@ -35,4 +35,10 @@ namespace Op {
     unsigned int adc(CPU *cpu, Op::Operands &operands, const Op::Opcode *opcode);
 
     unsigned int sbc(CPU *cpu, Op::Operands &operands, const Op::Opcode *opcode);
+
+    unsigned int cmp(CPU *cpu, Op::Operands &operands, const Op::Opcode *opcode);
+
+    unsigned int cpx(CPU *cpu, Op::Operands &operands, const Op::Opcode *opcode);
+
+    unsigned int cpy(CPU *cpu, Op::Operands &operands, const Op::Opcode *opcode);
 }

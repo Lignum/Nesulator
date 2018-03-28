@@ -18,13 +18,6 @@
 #include <iomanip>
 #include <iostream>
 
-static unsigned int unimplemented(CPU *cpu, Op::Operands &operands, const Op::Opcode *opcode) {
-    std::cerr << "Opcode $";
-    Utils::writeHexToStream(std::cerr, opcode->code);
-    std::cerr << " (" << opcode->name << ") has not been implemented yet!\n";
-    return 0;
-}
-
 static unsigned int unsupported(CPU *cpu, Op::Operands &operands, const Op::Opcode *opcode) {
     std::cerr << "Opcode $";
     Utils::writeHexToStream(std::cerr, opcode->code);
@@ -286,20 +279,20 @@ static const Opcode OPCODES[] = {
     /*
      * 0xC0 - 0xCF
      */
-    OP(0xC0, "CPY", AM::IMMEDIATE, unimplemented, 2),
-    OP(0xC1, "CMP", AM::INDEXED_INDIRECT, unimplemented, 6),
+    OP(0xC0, "CPY", AM::IMMEDIATE, Op::cpy, 2),
+    OP(0xC1, "CMP", AM::INDEXED_INDIRECT, Op::cmp, 6),
     UNSUPPORTED_OP(0xC2, "NOP", AM::IMMEDIATE, 2),
     UNSUPPORTED_OP(0xC3, "DCP", AM::INDEXED_INDIRECT, 8),
-    OP(0xC4, "CPY", AM::ZERO_PAGE, unimplemented, 3),
-    OP(0xC5, "CMP", AM::ZERO_PAGE, unimplemented, 3),
+    OP(0xC4, "CPY", AM::ZERO_PAGE, Op::cpy, 3),
+    OP(0xC5, "CMP", AM::ZERO_PAGE, Op::cmp, 3),
     OP(0xC6, "DEC", AM::ZERO_PAGE, Op::dec, 5),
     UNSUPPORTED_OP(0xC7, "DCP", AM::ZERO_PAGE, 5),
     OP(0xC8, "INY", AM::IMPLICIT, Op::iny, 2),
-    OP(0xC9, "CMP", AM::IMMEDIATE, unimplemented, 2),
+    OP(0xC9, "CMP", AM::IMMEDIATE, Op::cmp, 2),
     OP(0xCA, "DEX", AM::IMPLICIT, Op::dex, 2),
     UNSUPPORTED_OP(0xCB, "AXS", AM::IMMEDIATE, 2),
-    OP(0xCC, "CPY", AM::ABSOLUTE, unimplemented, 4),
-    OP(0xCD, "CMP", AM::ABSOLUTE, unimplemented, 4),
+    OP(0xCC, "CPY", AM::ABSOLUTE, Op::cpy, 4),
+    OP(0xCD, "CMP", AM::ABSOLUTE, Op::cmp, 4),
     OP(0xCE, "DEC", AM::ABSOLUTE, Op::dec, 6),
     UNSUPPORTED_OP(0xCF, "DCP", AM::ABSOLUTE, 6),
 
@@ -307,30 +300,30 @@ static const Opcode OPCODES[] = {
      * 0xD0 - 0xDF
      */
     OP(0xD0, "BNE", AM::RELATIVE, Op::bne, 2),
-    OP(0xD1, "CMP", AM::INDIRECT_INDEXED, unimplemented, 5),
+    OP(0xD1, "CMP", AM::INDIRECT_INDEXED, Op::cmp, 5),
     UNSUPPORTED_OP(0xD2, "KIL", AM::IMPLICIT, 0),
     UNSUPPORTED_OP(0xD3, "DCP", AM::INDIRECT_INDEXED, 8),
     UNSUPPORTED_OP(0xD4, "NOP", AM::ZERO_PAGE_X, 4),
-    OP(0xD5, "CMP", AM::ZERO_PAGE_X, unimplemented, 4),
+    OP(0xD5, "CMP", AM::ZERO_PAGE_X, Op::cmp, 4),
     OP(0xD6, "DEC", AM::ZERO_PAGE_X, Op::dec, 6),
     UNSUPPORTED_OP(0xD7, "DCP", AM::ZERO_PAGE_X, 6),
     OP(0xD8, "CLD", AM::IMPLICIT, Op::cld, 2),
-    OP(0xD9, "CMP", AM::ABSOLUTE_Y, unimplemented, 4),
+    OP(0xD9, "CMP", AM::ABSOLUTE_Y, Op::cmp, 4),
     UNSUPPORTED_OP(0xDA, "NOP", AM::IMPLICIT, 2),
     UNSUPPORTED_OP(0xDB, "DCP", AM::ABSOLUTE_Y, 7),
     UNSUPPORTED_OP(0xDC, "NOP", AM::ABSOLUTE_X, 4),
-    OP(0xDD, "CMP", AM::ABSOLUTE_X, unimplemented, 4),
+    OP(0xDD, "CMP", AM::ABSOLUTE_X, Op::cmp, 4),
     OP(0xDE, "DEC", AM::ABSOLUTE_X, Op::dec, 7),
     UNSUPPORTED_OP(0xDF, "DCP", AM::ABSOLUTE_X, 7),
 
     /*
      * 0xE0 - 0xEF
      */
-    OP(0xE0, "CPX", AM::IMMEDIATE, unimplemented, 2),
+    OP(0xE0, "CPX", AM::IMMEDIATE, Op::cpx, 2),
     OP(0xE1, "SBC", AM::INDEXED_INDIRECT, Op::sbc, 6),
     UNSUPPORTED_OP(0xE2, "NOP", AM::IMMEDIATE, 2),
     UNSUPPORTED_OP(0xE3, "ISC", AM::INDEXED_INDIRECT, 8),
-    OP(0xE4, "CPX", AM::ZERO_PAGE, unimplemented, 3),
+    OP(0xE4, "CPX", AM::ZERO_PAGE, Op::cpx, 3),
     OP(0xE5, "SBC", AM::ZERO_PAGE, Op::sbc, 3),
     OP(0xE6, "INC", AM::ZERO_PAGE, Op::inc, 5),
     UNSUPPORTED_OP(0xE7, "ISC", AM::ZERO_PAGE, 5),
@@ -338,7 +331,7 @@ static const Opcode OPCODES[] = {
     OP(0xE9, "SBC", AM::IMMEDIATE, Op::sbc, 2),
     OP(0xEA, "NOP", AM::IMPLICIT, nop, 2),
     UNSUPPORTED_OP(0xEB, "SBC", AM::IMMEDIATE, 2),
-    OP(0xEC, "CPX", AM::ABSOLUTE, unimplemented, 4),
+    OP(0xEC, "CPX", AM::ABSOLUTE, Op::cpx, 4),
     OP(0xED, "SBC", AM::ABSOLUTE, Op::sbc, 4),
     OP(0xEE, "INC", AM::ABSOLUTE, Op::inc, 6),
     UNSUPPORTED_OP(0xEF, "ISC", AM::ABSOLUTE, 6),
