@@ -22,4 +22,13 @@ namespace Op {
     unsigned int dex(CPU *cpu, Op::Operands &operands, const Op::Opcode *opcode);
 
     unsigned int dey(CPU *cpu, Op::Operands &operands, const Op::Opcode *opcode);
+
+    // Why the fuck is this a keyword!!!
+    unsigned int _and(CPU *cpu, Op::Operands &operands, const Op::Opcode *opcode);
+
+    unsigned int ora(CPU *cpu, Op::Operands &operands, const Op::Opcode *opcode);
+
+    unsigned int eor(CPU *cpu, Op::Operands &operands, const Op::Opcode *opcode);
+
+    unsigned int bit(CPU *cpu, Op::Operands &operands, const Op::Opcode *opcode);
 }
