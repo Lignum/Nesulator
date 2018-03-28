@@ -6,6 +6,8 @@
 #include <cstdint>
 
 extern const size_t NES_INTERNAL_MEMORY_SIZE;
+extern const size_t NES_PAGE_SIZE;
+extern const Address NES_STACK_ADDRESS;
 
 class NES;
 

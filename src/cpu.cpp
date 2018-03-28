@@ -3,6 +3,7 @@
 #include "nes.h"
 #include "op.h"
 #include "utils.h"
+#include "memory.h"
 
 #include <vector>
 #include <string>
@@ -35,6 +36,19 @@ bool CPU::isFlagSet(CPUFlag flag) const {
 
 void CPU::setFlag(CPUFlag flag, bool set) {
     r.p = (CPUFlag)(set ? (uint8_t)r.p | (uint8_t)flag : (uint8_t)r.p & ~(uint8_t)flag);
+}
+
+void CPU::push(uint8_t value) {
+    Memory *mem = nes->getMemory();
+    mem->write(NES_STACK_ADDRESS + r.s, value);
+    r.s--;
+}
+
+uint8_t CPU::pull() {
+    r.s++;
+    Memory *mem = nes->getMemory();
+    uint8_t value = mem->read(NES_STACK_ADDRESS + r.s);
+    return value;
 }
 
 unsigned int CPU::step() {

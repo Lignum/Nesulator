@@ -9,6 +9,7 @@
 #include "op/transfers.h"
 #include "op/flags.h"
 #include "op/control.h"
+#include "op/stack.h"
 #include "utils.h"
 
 #include <vector>
@@ -52,7 +53,7 @@ static const Opcode OPCODES[] = {
     OP(0x05, "ORA", AM::ZERO_PAGE, unimplemented, 3),
     OP(0x06, "ASL", AM::ZERO_PAGE, unimplemented, 5),
     UNSUPPORTED_OP(0x07, "SLO", AM::ZERO_PAGE, 5),
-    OP(0x08, "PHP", AM::IMPLICIT, unimplemented, 3),
+    OP(0x08, "PHP", AM::IMPLICIT, Op::php, 3),
     OP(0x09, "ORA", AM::IMMEDIATE, unimplemented, 2),
     OP(0x0A, "ASL", AM::ACCUMULATOR, unimplemented, 2),
     UNSUPPORTED_OP(0x0B, "ANC", AM::IMMEDIATE, 2),
@@ -92,7 +93,7 @@ static const Opcode OPCODES[] = {
     OP(0x25, "AND", AM::ZERO_PAGE, unimplemented, 3),
     OP(0x26, "ROL", AM::ZERO_PAGE, unimplemented, 5),
     UNSUPPORTED_OP(0x27, "RLA", AM::ZERO_PAGE, 5),
-    OP(0x28, "PLP", AM::IMPLICIT, unimplemented, 4),
+    OP(0x28, "PLP", AM::IMPLICIT, Op::plp, 4),
     OP(0x29, "AND", AM::IMMEDIATE, unimplemented, 2),
     OP(0x2A, "ROL", AM::ACCUMULATOR, unimplemented, 2),
     UNSUPPORTED_OP(0x2B, "ANC", AM::IMMEDIATE, 2),
@@ -132,7 +133,7 @@ static const Opcode OPCODES[] = {
     OP(0x45, "EOR", AM::ZERO_PAGE, unimplemented, 3),
     OP(0x46, "LSR", AM::ZERO_PAGE, unimplemented, 5),
     UNSUPPORTED_OP(0x47, "SRE", AM::ZERO_PAGE, 5),
-    OP(0x48, "PHA", AM::IMPLICIT, unimplemented, 3),
+    OP(0x48, "PHA", AM::IMPLICIT, Op::pha, 3),
     OP(0x49, "EOR", AM::IMMEDIATE, unimplemented, 2),
     OP(0x4A, "LSR", AM::ACCUMULATOR, unimplemented, 2),
     UNSUPPORTED_OP(0x4B, "ALR", AM::IMMEDIATE, 2),
@@ -172,7 +173,7 @@ static const Opcode OPCODES[] = {
     OP(0x65, "ADC", AM::ZERO_PAGE, unimplemented, 3),
     OP(0x66, "ROR", AM::ZERO_PAGE, unimplemented, 5),
     UNSUPPORTED_OP(0x67, "RRA", AM::ZERO_PAGE, 5),
-    OP(0x68, "PLA", AM::IMPLICIT, unimplemented, 4),
+    OP(0x68, "PLA", AM::IMPLICIT, Op::pla, 4),
     OP(0x69, "ADC", AM::IMMEDIATE, unimplemented, 2),
     OP(0x6A, "ROR", AM::ACCUMULATOR, unimplemented, 2),
     UNSUPPORTED_OP(0x6B, "ARR", AM::IMMEDIATE, 2),

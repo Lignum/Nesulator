@@ -38,6 +38,10 @@ public:
 
     void setFlag(CPUFlag flag, bool set);
 
+    void push(uint8_t value);
+
+    uint8_t pull();
+
     unsigned int step();
 
     void printState() const;

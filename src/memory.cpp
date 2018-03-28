@@ -4,6 +4,8 @@
 #include "utils.h"
 
 const size_t NES_INTERNAL_MEMORY_SIZE = 2048;
+const size_t NES_PAGE_SIZE = 256;
+const Address NES_STACK_ADDRESS = NES_PAGE_SIZE * 1;
 
 Memory::Memory(NES *nes)
     : nes(nes),
