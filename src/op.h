@@ -28,6 +28,14 @@ namespace Op {
 
     size_t getAddressingModeOperandCount(AddressingMode mode);
 
+    uint8_t address(CPU *cpu, AddressingMode mode, const Operands &operands);
+
+    void setNegativeFlag(CPU *cpu, uint8_t value);
+
+    void setZeroFlag(CPU *cpu, uint8_t value);
+
+    void setNZFlags(CPU *cpu, uint8_t value);
+
     struct Opcode {
         uint8_t code;
         unsigned int baseCycles;

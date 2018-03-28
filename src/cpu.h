@@ -32,13 +32,15 @@ public:
 
     NES *getNES();
 
-    RegisterFile *getRegisterFile();
+    RegisterFile *getRegs();
 
     bool isFlagSet(CPUFlag flag) const;
 
     void setFlag(CPUFlag flag, bool set);
 
-    void step();
+    unsigned int step();
+
+    void printState() const;
 
 private:
     NES *nes;

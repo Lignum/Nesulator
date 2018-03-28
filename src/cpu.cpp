@@ -23,7 +23,7 @@ NES *CPU::getNES() {
     return nes;
 }
 
-RegisterFile *CPU::getRegisterFile() {
+RegisterFile *CPU::getRegs() {
     return &r;
 }
 
@@ -39,13 +39,13 @@ void CPU::setFlag(CPUFlag flag, bool set) {
     }
 }
 
-void CPU::step() {
+unsigned int CPU::step() {
     const uint8_t op = fetch();
     const Op::Opcode *opDecoded = Op::decode(op);
 
     if (opDecoded == nullptr) {
         fprintf(stderr, "0x%02X was not a valid opcode!", op);
-        return;
+        return 0;
     }
 
     const size_t operandCount = Op::getAddressingModeOperandCount(opDecoded->mode);
@@ -57,7 +57,8 @@ void CPU::step() {
     std::vector<uint8_t> operands;
     operands.reserve(operandCount);
     fetchOperands(operandCount, operands);
-    opDecoded->handler(this, operands, opDecoded);
+
+    return opDecoded->handler(this, operands, opDecoded) + opDecoded->baseCycles;
 }
 
 uint8_t CPU::fetch() {
@@ -72,4 +73,8 @@ void CPU::fetchOperands(size_t count, std::vector<uint8_t> &operands) {
         const uint8_t op = fetch();
         operands.push_back(op);
     }
+}
+
+void CPU::printState() const {
+    printf("A=%02X, X=%02X, Y=%02X, P=%02X, SP=%02X, PC=%04X\n", r.a, r.x, r.y, r.p, r.sp, r.pc);
 }

@@ -1,7 +1,10 @@
 #include "op.h"
 
 #include "cpu.h"
+#include "nes.h"
+#include "memory.h"
 #include "op/irq.h"
+#include "op/loads.h"
 
 #include <vector>
 #include <cstdio>
@@ -226,41 +229,41 @@ static const Opcode OPCODES[] = {
     /*
      * 0xA0 - 0xAF
      */
-    OP(0xA0, "LDY", AM::IMMEDIATE, unimplemented, 2),
-    OP(0xA1, "LDA", AM::INDEXED_INDIRECT, unimplemented, 6),
-    OP(0xA2, "LDX", AM::IMMEDIATE, unimplemented, 2),
+    OP(0xA0, "LDY", AM::IMMEDIATE, Op::ldy, 2),
+    OP(0xA1, "LDA", AM::INDEXED_INDIRECT, Op::lda, 6),
+    OP(0xA2, "LDX", AM::IMMEDIATE, Op::ldx, 2),
     UNSUPPORTED_OP(0xA3, "LAX", AM::INDEXED_INDIRECT, 6),
-    OP(0xA4, "LDY", AM::ZERO_PAGE, unimplemented, 3),
-    OP(0xA5, "LDA", AM::ZERO_PAGE, unimplemented, 3),
-    OP(0xA6, "LDX", AM::ZERO_PAGE, unimplemented, 3),
+    OP(0xA4, "LDY", AM::ZERO_PAGE, Op::ldy, 3),
+    OP(0xA5, "LDA", AM::ZERO_PAGE, Op::lda, 3),
+    OP(0xA6, "LDX", AM::ZERO_PAGE, Op::ldx, 3),
     UNSUPPORTED_OP(0xA7, "LAX", AM::ZERO_PAGE, 3),
     OP(0xA8, "TAY", AM::IMPLICIT, unimplemented, 2),
-    OP(0xA9, "LDA", AM::IMMEDIATE, unimplemented, 2),
+    OP(0xA9, "LDA", AM::IMMEDIATE, Op::lda, 2),
     OP(0xAA, "TAX", AM::IMPLICIT, unimplemented, 2),
     UNSUPPORTED_OP(0xAB, "LAX", AM::IMMEDIATE, 2),
-    OP(0xAC, "LDY", AM::ABSOLUTE, unimplemented, 4),
-    OP(0xAD, "LDA", AM::ABSOLUTE, unimplemented, 4),
-    OP(0xAE, "LDX", AM::ABSOLUTE, unimplemented, 4),
+    OP(0xAC, "LDY", AM::ABSOLUTE, Op::ldy, 4),
+    OP(0xAD, "LDA", AM::ABSOLUTE, Op::lda, 4),
+    OP(0xAE, "LDX", AM::ABSOLUTE, Op::ldx, 4),
     UNSUPPORTED_OP(0xAF, "LAX", AM::ABSOLUTE, 4),
 
     /*
      * 0xB0 - 0xBF
      */
     OP(0xB0, "BCS", AM::RELATIVE, unimplemented, 2),
-    OP(0xB1, "LDA", AM::INDIRECT_INDEXED, unimplemented, 5),
+    OP(0xB1, "LDA", AM::INDIRECT_INDEXED, Op::lda, 5),
     UNSUPPORTED_OP(0xB2, "KIL", AM::IMPLICIT, 0),
     UNSUPPORTED_OP(0xB3, "LAX", AM::INDIRECT_INDEXED, 5),
-    OP(0xB4, "LDY", AM::ZERO_PAGE_X, unimplemented, 4),
-    OP(0xB5, "LDA", AM::ZERO_PAGE_X, unimplemented, 4),
-    OP(0xB6, "LDX", AM::ZERO_PAGE_Y, unimplemented, 4),
+    OP(0xB4, "LDY", AM::ZERO_PAGE_X, Op::ldy, 4),
+    OP(0xB5, "LDA", AM::ZERO_PAGE_X, Op::lda, 4),
+    OP(0xB6, "LDX", AM::ZERO_PAGE_Y, Op::ldx, 4),
     UNSUPPORTED_OP(0xB7, "LAX", AM::ZERO_PAGE_Y, 4),
     OP(0xB8, "CLV", AM::IMPLICIT, unimplemented, 2),
-    OP(0xB9, "LDA", AM::ABSOLUTE_Y, unimplemented, 4),
+    OP(0xB9, "LDA", AM::ABSOLUTE_Y, Op::lda, 4),
     OP(0xBA, "TSX", AM::IMPLICIT, unimplemented, 2),
     UNSUPPORTED_OP(0xBB, "LAS", AM::ABSOLUTE_Y, 4),
-    OP(0xBC, "LDY", AM::ABSOLUTE_X, unimplemented, 4),
-    OP(0xBD, "LDA", AM::ABSOLUTE_X, unimplemented, 4),
-    OP(0xBE, "LDX", AM::ABSOLUTE_Y, unimplemented, 4),
+    OP(0xBC, "LDY", AM::ABSOLUTE_X, Op::ldy, 4),
+    OP(0xBD, "LDA", AM::ABSOLUTE_X, Op::lda, 4),
+    OP(0xBE, "LDX", AM::ABSOLUTE_Y, Op::ldx, 4),
     UNSUPPORTED_OP(0xBF, "LAX", AM::ABSOLUTE_Y, 4),
 
     /*
@@ -368,4 +371,52 @@ size_t Op::getAddressingModeOperandCount(Op::AddressingMode mode) {
         case AM::INDIRECT:
             return 2;
     }
+}
+
+uint8_t Op::address(CPU *cpu, Op::AddressingMode mode, const Op::Operands &operands) {
+    RegisterFile *r = cpu->getRegs();
+    Memory *mem = cpu->getNES()->getMemory();
+
+    switch (mode) {
+        case AM::IMPLICIT:
+            return 0;
+
+        case AM::IMMEDIATE:
+            return operands[0];
+
+        case AM::ZERO_PAGE:
+            return mem->read((Address)operands[0]);
+
+        case AM::ZERO_PAGE_X:
+            return mem->read((Address)(operands[0] + r->x));
+
+        case AM::ZERO_PAGE_Y:
+            return mem->read((Address)(operands[0] + r->y));
+
+        case AM::ABSOLUTE:
+            return mem->read((Address)operands[1] << 8 | (Address)operands[0]);
+
+        case AM::ABSOLUTE_X:
+            return mem->read(((Address)operands[1] << 8 | (Address)operands[0]) + r->x);
+
+        case AM::ABSOLUTE_Y:
+            return mem->read(((Address)operands[1] << 8 | (Address)operands[0]) + r->y);
+
+        default:
+            // TODO: Implement.
+            return 0;
+    }
+}
+
+void Op::setNegativeFlag(CPU *cpu, uint8_t value) {
+    cpu->setFlag(CPUFlag::NEGATIVE, ((value >> 7) & 0b1) == 1);
+}
+
+void Op::setZeroFlag(CPU *cpu, uint8_t value) {
+    cpu->setFlag(CPUFlag::ZERO, value == 0);
+}
+
+void Op::setNZFlags(CPU *cpu, uint8_t value) {
+    setNegativeFlag(cpu, value);
+    setZeroFlag(cpu, value);
 }
