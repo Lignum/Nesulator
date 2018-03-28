@@ -5,9 +5,12 @@
 #include "memory.h"
 #include "op/irq.h"
 #include "op/loads.h"
+#include "utils.h"
 
 #include <vector>
 #include <cstdio>
+#include <sstream>
+#include <iomanip>
 
 static unsigned int unimplemented(CPU *cpu, Op::Operands &operands, const Op::Opcode *opcode) {
     fprintf(stderr, "Opcode 0x%02X (%s) has not been implemented yet!\n", opcode->code, opcode->name);
@@ -394,13 +397,13 @@ uint8_t Op::address(CPU *cpu, Op::AddressingMode mode, const Op::Operands &opera
             return mem->read((Address)(operands[0] + r->y));
 
         case AM::ABSOLUTE:
-            return mem->read((Address)operands[1] << 8 | (Address)operands[0]);
+            return mem->read(Utils::combineUint8sLE(operands[1], operands[0]));
 
         case AM::ABSOLUTE_X:
-            return mem->read(((Address)operands[1] << 8 | (Address)operands[0]) + r->x);
+            return mem->read(Utils::combineUint8sLE(operands[1], operands[0]) + r->x);
 
         case AM::ABSOLUTE_Y:
-            return mem->read(((Address)operands[1] << 8 | (Address)operands[0]) + r->y);
+            return mem->read(Utils::combineUint8sLE(operands[1], operands[0]) + r->y);
 
         default:
             // TODO: Implement.
@@ -419,4 +422,86 @@ void Op::setZeroFlag(CPU *cpu, uint8_t value) {
 void Op::setNZFlags(CPU *cpu, uint8_t value) {
     setNegativeFlag(cpu, value);
     setZeroFlag(cpu, value);
+}
+
+template<typename T>
+static void writeHexToSS(std::ostringstream &stream, T x) {
+    stream << std::uppercase << std::setfill('0') << std::setw((int)(sizeof(T) * 2)) << std::hex << (size_t)x;
+}
+
+void Op::formatInstruction(const Opcode *opcode, const Op::Operands &operands, std::string *outFormatted) {
+    if (!outFormatted) {
+        return;
+    }
+
+    std::ostringstream stream;
+    stream << opcode->name;
+
+    switch (opcode->mode) {
+        case AM::IMPLICIT:
+            break;
+
+        case AM::IMMEDIATE:
+            stream << " #$";
+            writeHexToSS(stream, operands[0]);
+            break;
+
+        case AM::ZERO_PAGE:
+            stream << " $";
+            writeHexToSS(stream, operands[0]);
+            break;
+
+        case AM::ZERO_PAGE_X:
+            stream << " $";
+            writeHexToSS(stream, operands[0]);
+            stream << ", X";
+            break;
+
+        case AM::ZERO_PAGE_Y:
+            stream << " $";
+            writeHexToSS(stream, operands[0]);
+            stream << ", Y";
+            break;
+
+        case AM::INDEXED_INDIRECT:
+            stream << " ($";
+            writeHexToSS(stream, operands[0]);
+            stream << ", X)";
+            break;
+
+        case AM::INDIRECT_INDEXED:
+            stream << " ($";
+            writeHexToSS(stream, operands[0]);
+            stream << "), Y";
+            break;
+
+        case AM::ABSOLUTE:
+            stream << " $";
+            writeHexToSS(stream, Utils::combineUint8sLE(operands[0], operands[1]));
+            break;
+
+        case AM::ABSOLUTE_X:
+            stream << " $";
+            writeHexToSS(stream, Utils::combineUint8sLE(operands[0], operands[1]));
+            stream << ", X";
+            break;
+
+        case AM::ABSOLUTE_Y:
+            stream << " $";
+            writeHexToSS(stream, Utils::combineUint8sLE(operands[0], operands[1]));
+            stream << ", Y";
+            break;
+
+        case AM::INDIRECT:
+            stream << " ($";
+            writeHexToSS(stream, Utils::combineUint8sLE(operands[0], operands[1]));
+            stream << ")";
+            break;
+
+        case AM::RELATIVE:
+            stream << " *" << (int8_t)operands[0];
+            break;
+    }
+
+    *outFormatted = stream.str();
 }

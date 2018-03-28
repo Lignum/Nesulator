@@ -4,6 +4,8 @@
 #include "op.h"
 
 #include <vector>
+#include <string>
+#include <iostream>
 #include <cstdio>
 
 CPU::CPU(NES *nes)
@@ -50,13 +52,15 @@ unsigned int CPU::step() {
 
     const size_t operandCount = Op::getAddressingModeOperandCount(opDecoded->mode);
 
-#ifdef NESULATOR_DEBUG
-    printf("%s\n", opDecoded->name);
-#endif
-
     std::vector<uint8_t> operands;
     operands.reserve(operandCount);
     fetchOperands(operandCount, operands);
+
+#ifdef NESULATOR_DEBUG
+    std::string inst;
+    Op::formatInstruction(opDecoded, operands, &inst);
+    std::cout << inst << "\n";
+#endif
 
     return opDecoded->handler(this, operands, opDecoded) + opDecoded->baseCycles;
 }
@@ -76,5 +80,5 @@ void CPU::fetchOperands(size_t count, std::vector<uint8_t> &operands) {
 }
 
 void CPU::printState() const {
-    printf("A=%02X, X=%02X, Y=%02X, P=%02X, SP=%02X, PC=%04X\n", r.a, r.x, r.y, r.p, r.sp, r.pc);
+    printf("A=$%02X, X=$%02X, Y=$%02X, P=$%02X, SP=$%02X, PC=$%04X\n", r.a, r.x, r.y, r.p, r.sp, r.pc);
 }

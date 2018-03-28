@@ -4,11 +4,25 @@
 
 int main() {
     NES nes;
-    nes.getMemory()->write(0x00, 0xA9);
-    nes.getMemory()->write(0x01, 0x7F);
+    nes.getMemory()->write(0x00, 0xB5);
+    nes.getMemory()->write(0x01, 0x6F);
+
+    nes.getMemory()->write(0x02, 0xA2);
+    nes.getMemory()->write(0x03, 0x01);
+
+    nes.getMemory()->write(0x04, 0xB5);
+    nes.getMemory()->write(0x05, 0x6F);
+
+    nes.getMemory()->write(0x6F, 0xAB);
+    nes.getMemory()->write(0x70, 0xCD);
+
     nes.getCPU()->printState();
-    unsigned int cycles = nes.getCPU()->step();
+    nes.getCPU()->step();
     nes.getCPU()->printState();
-    printf("Step took %u cycles", cycles);
+    nes.getCPU()->step();
+    nes.getCPU()->printState();
+    nes.getCPU()->step();
+    nes.getCPU()->printState();
+
     return 0;
 }

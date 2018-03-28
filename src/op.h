@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <string>
 #include <cstdint>
 
 class CPU;
@@ -35,6 +36,8 @@ namespace Op {
     void setZeroFlag(CPU *cpu, uint8_t value);
 
     void setNZFlags(CPU *cpu, uint8_t value);
+
+    void formatInstruction(const Opcode *opcode, const Operands &operands, std::string *outFormatted);
 
     struct Opcode {
         uint8_t code;
