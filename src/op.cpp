@@ -47,7 +47,7 @@ static const Opcode OPCODES[] = {
     UNSUPPORTED_OP(0x07, "SLO", AM::ZERO_PAGE, 5),
     OP(0x08, "PHP", AM::IMPLICIT, unimplemented, 3),
     OP(0x09, "ORA", AM::IMMEDIATE, unimplemented, 2),
-    OP(0x0A, "ASL", AM::IMPLICIT, unimplemented, 2),
+    OP(0x0A, "ASL", AM::ACCUMULATOR, unimplemented, 2),
     UNSUPPORTED_OP(0x0B, "ANC", AM::IMMEDIATE, 2),
     UNSUPPORTED_OP(0x0C, "NOP", AM::ABSOLUTE, 4),
     OP(0x0D, "ORA", AM::ABSOLUTE, unimplemented, 4),
@@ -87,7 +87,7 @@ static const Opcode OPCODES[] = {
     UNSUPPORTED_OP(0x27, "RLA", AM::ZERO_PAGE, 5),
     OP(0x28, "PLP", AM::IMPLICIT, unimplemented, 4),
     OP(0x29, "AND", AM::IMMEDIATE, unimplemented, 2),
-    OP(0x2A, "ROL", AM::IMPLICIT, unimplemented, 2),
+    OP(0x2A, "ROL", AM::ACCUMULATOR, unimplemented, 2),
     UNSUPPORTED_OP(0x2B, "ANC", AM::IMMEDIATE, 2),
     OP(0x2C, "BIT", AM::ABSOLUTE, unimplemented, 4),
     OP(0x2D, "AND", AM::ABSOLUTE, unimplemented, 4),
@@ -127,7 +127,7 @@ static const Opcode OPCODES[] = {
     UNSUPPORTED_OP(0x47, "SRE", AM::ZERO_PAGE, 5),
     OP(0x48, "PHA", AM::IMPLICIT, unimplemented, 3),
     OP(0x49, "EOR", AM::IMMEDIATE, unimplemented, 2),
-    OP(0x4A, "LSR", AM::IMPLICIT, unimplemented, 2),
+    OP(0x4A, "LSR", AM::ACCUMULATOR, unimplemented, 2),
     UNSUPPORTED_OP(0x4B, "ALR", AM::IMMEDIATE, 2),
     OP(0x4C, "JMP", AM::ABSOLUTE, unimplemented, 3),
     OP(0x4D, "EOR", AM::ABSOLUTE, unimplemented, 4),
@@ -167,7 +167,7 @@ static const Opcode OPCODES[] = {
     UNSUPPORTED_OP(0x67, "RRA", AM::ZERO_PAGE, 5),
     OP(0x68, "PLA", AM::IMPLICIT, unimplemented, 4),
     OP(0x69, "ADC", AM::IMMEDIATE, unimplemented, 2),
-    OP(0x6A, "ROR", AM::IMPLICIT, unimplemented, 2),
+    OP(0x6A, "ROR", AM::ACCUMULATOR, unimplemented, 2),
     UNSUPPORTED_OP(0x6B, "ARR", AM::IMMEDIATE, 2),
     OP(0x6C, "JMP", AM::INDIRECT, unimplemented, 5),
     OP(0x6D, "ADC", AM::ABSOLUTE, unimplemented, 4),
@@ -362,6 +362,7 @@ const Opcode *Op::decode(uint8_t op) {
 size_t Op::getAddressingModeOperandCount(Op::AddressingMode mode) {
     switch (mode) {
         case AM::IMPLICIT:
+        case AM::ACCUMULATOR:
             return 0;
 
         case AM::IMMEDIATE:
@@ -382,11 +383,15 @@ size_t Op::getAddressingModeOperandCount(Op::AddressingMode mode) {
 }
 
 uint8_t Op::address(CPU *cpu, Op::AddressingMode mode, const Op::Operands &operands) {
-    Memory *mem = cpu->getNES()->getMemory();
+    const RegisterFile *r = cpu->getRegs();
+    const Memory *mem = cpu->getNES()->getMemory();
 
     switch (mode) {
         case AM::IMPLICIT:
             return 0;
+
+        case AM::ACCUMULATOR:
+            return r->a;
 
         case AM::IMMEDIATE:
             return operands[0];
@@ -397,11 +402,12 @@ uint8_t Op::address(CPU *cpu, Op::AddressingMode mode, const Op::Operands &opera
 }
 
 Address Op::getAddress(CPU *cpu, Op::AddressingMode mode, const Op::Operands &operands) {
-    RegisterFile *r = cpu->getRegs();
-    Memory *mem = cpu->getNES()->getMemory();
+    const RegisterFile *r = cpu->getRegs();
+    const Memory *mem = cpu->getNES()->getMemory();
 
     switch (mode) {
         case AM::IMPLICIT:
+        case AM::ACCUMULATOR:
         case AM::IMMEDIATE:
             return 0;
 
@@ -464,6 +470,10 @@ void Op::formatInstruction(const Opcode *opcode, const Op::Operands &operands, s
 
     switch (opcode->mode) {
         case AM::IMPLICIT:
+            break;
+
+        case AM::ACCUMULATOR:
+            stream << " A";
             break;
 
         case AM::IMMEDIATE:

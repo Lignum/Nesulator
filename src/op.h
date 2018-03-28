@@ -16,6 +16,7 @@ namespace Op {
 
     enum class AddressingMode: uint8_t {
         IMPLICIT,
+        ACCUMULATOR,
         IMMEDIATE,
         ZERO_PAGE,
         ZERO_PAGE_X,
