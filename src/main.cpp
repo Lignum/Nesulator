@@ -1,3 +1,4 @@
+#include "ines.h"
 #include "nes.h"
 #include "utils.h"
 
@@ -85,5 +86,13 @@ int main() {
     std::cout << "$0024: $";
     Utils::writeHexToStream(std::cout, mem->read(0x0024));
     std::cout << "\n";
+
+    iNES::File file;
+    iNES::LoadError error = iNES::loadFromFile("test.nes", file);
+
+    if (error != iNES::LoadError::NO_ERROR) {
+        std::cerr << "iNES Load Error: " << iNES::getLoadErrorMessage(error) << "\n";
+    }
+
     return 0;
 }
