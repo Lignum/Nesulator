@@ -9,6 +9,7 @@ namespace iNES {
     extern const size_t PRG_ROM_SIZE;
     extern const size_t CHR_ROM_SIZE;
     extern const char HEADER_MAGIC_BYTES[4];
+    extern const size_t TRAINER_SIZE;
 
     struct Header {
         char magicBytes[4];
@@ -23,6 +24,7 @@ namespace iNES {
 
     struct File {
         Header header;
+        std::vector<uint8_t> trainer;
         std::vector<uint8_t> prgROM;
         std::vector<uint8_t> chrROM;
     };

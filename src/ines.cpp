@@ -1,4 +1,5 @@
 #include "ines.h"
+#include "utils.h"
 
 #include <cstdio>
 #include <vector>
@@ -8,6 +9,7 @@
 const size_t iNES::PRG_ROM_SIZE = 16384;
 const size_t iNES::CHR_ROM_SIZE = 8192;
 const char iNES::HEADER_MAGIC_BYTES[4] = { 'N', 'E', 'S', '\x1A' };
+const size_t iNES::TRAINER_SIZE = 512;
 
 static iNES::LoadError getFileError(FILE *fp) {
     if (feof(fp)) {
@@ -46,6 +48,17 @@ iNES::LoadError iNES::loadFromFile(const std::string &file, File &outFile) {
         return iNES::LoadError::MAGIC_BYTES_MISMATCH;
     }
 
+    const bool hasTrainer = Utils::isBitSet(outFile.header.flags6, 2);
+
+    if (hasTrainer) {
+        outFile.trainer.resize(TRAINER_SIZE);
+
+        if (fread(outFile.trainer.data(), sizeof(uint8_t), TRAINER_SIZE, fp) < TRAINER_SIZE) {
+            fclose(fp);
+            return getFileError(fp);
+        }
+    }
+
     const size_t prgSize = outFile.header.prgROMCount * iNES::PRG_ROM_SIZE;
     outFile.prgROM.resize(prgSize);
 
@@ -69,10 +82,10 @@ iNES::LoadError iNES::loadFromFile(const std::string &file, File &outFile) {
 std::string iNES::getLoadErrorMessage(iNES::LoadError error) {
     switch (error) {
         case iNES::LoadError::NO_ERROR:
-            return "No error";
+            return "No error.";
 
         case iNES::LoadError::UNKNOWN_ERROR:
-            return "Unknown error";
+            return "Unknown error. Is the file corrupted?";
 
         case iNES::LoadError::OPEN_FAILED:
             return "Could not open file!";
@@ -84,7 +97,7 @@ std::string iNES::getLoadErrorMessage(iNES::LoadError error) {
             return "Failed to read from file!";
 
         case iNES::LoadError::EARLY_END_OF_FILE:
-            return "File ended abruptly. Is this file corrupted?";
+            return "File ended abruptly. Is the file corrupted?";
     }
 }
 

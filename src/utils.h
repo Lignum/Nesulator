@@ -30,6 +30,11 @@ namespace Utils {
     }
 
     template<typename T>
+    constexpr bool isBitSet(T bits, unsigned int bit) {
+        return (bits & (1 << bit)) != 0;
+    }
+
+    template<typename T>
     void writeHexToStream(std::ostream &stream, T x) {
         stream << std::uppercase << std::setfill('0') << std::setw((int)(sizeof(T) * 2)) << std::hex << (uint64_t)x;
     }
