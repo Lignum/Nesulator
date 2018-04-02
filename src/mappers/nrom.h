@@ -11,4 +11,7 @@ public:
     void write(Address address, uint8_t value) override;
 
     void step();
+
+private:
+
 };

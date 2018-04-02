@@ -4,8 +4,10 @@
 #include "cpu.h"
 #include "memory.h"
 #include "mappers.h"
+#include "utils.h"
 
 #include <utility>
+#include <iostream>
 
 NES::NES(Cartridge &cartridge)
     : cartridge(std::move(cartridge)),
@@ -13,6 +15,11 @@ NES::NES(Cartridge &cartridge)
       mem(this)
 {
     this->cartridge.initMapper(this);
+
+    std::cout << "Reset vector is $";
+    Utils::writeHexToStream(std::cout, mem.getResetVector());
+    std::cout << "\n";
+    cpu.jump(mem.getResetVector());
 }
 
 CPU *NES::getCPU() {

@@ -21,9 +21,17 @@ public:
      */
     explicit Cartridge(iNES::File &file);
 
+    size_t getPRGROMCount() const;
+
     const std::vector<uint8_t> *getPRGROM() const;
 
+    size_t getCHRCount() const;
+
     std::vector<uint8_t> *getCHR();
+
+    size_t getPRGRAMCount() const;
+
+    std::vector<uint8_t> *getPRGRAM();
 
     /**
      * @return true if getCHR returns CHR-RAM, false if getCHR returns CHR-ROM.
@@ -40,6 +48,7 @@ private:
     bool chrram;
     std::vector<uint8_t> prg;
     std::vector<uint8_t> chr;
+    std::vector<uint8_t> prgram;
     uint8_t mapperNumber;
     std::unique_ptr<Mapper> mapper;
 };

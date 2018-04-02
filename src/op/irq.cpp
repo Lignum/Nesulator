@@ -19,7 +19,7 @@ unsigned int Op::brk(CPU *cpu, Op::Operands &operands, const Op::Opcode *opcode)
     cpu->setFlag(CPUFlag::IRQ_DISABLE, true);
 
     Memory *mem = cpu->getNES()->getMemory();
-    r->pc = Utils::combineUint8sLE(mem->read(0xFFFE), mem->read(0xFFFF));
+    r->pc = mem->getIRQVector();
     return 0;
 }
 

@@ -7,6 +7,7 @@
 #include <cstring>
 
 const size_t iNES::PRG_ROM_SIZE = 16384;
+const size_t iNES::PRG_RAM_SIZE = 8192;
 const size_t iNES::CHR_ROM_SIZE = 8192;
 const char iNES::HEADER_MAGIC_BYTES[4] = { 'N', 'E', 'S', '\x1A' };
 const size_t iNES::TRAINER_SIZE = 512;
@@ -34,7 +35,7 @@ iNES::LoadError iNES::loadFromFile(const std::string &file, File &outFile) {
         fread(&outFile.header.chrROMCount, sizeof(uint8_t), 1, fp) +
         fread(&outFile.header.flags6, sizeof(uint8_t), 1, fp) +
         fread(&outFile.header.flags7, sizeof(uint8_t), 1, fp) +
-        fread(&outFile.header.prgRAMSize, sizeof(uint8_t), 1, fp) +
+        fread(&outFile.header.prgRAMCount, sizeof(uint8_t), 1, fp) +
         fread(&outFile.header.padding, sizeof(uint8_t), sizeof(outFile.header.padding) / sizeof(uint8_t), fp);
 
     if (headerBytesRead < 16) {

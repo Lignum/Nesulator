@@ -109,3 +109,7 @@ void CPU::printState() const {
 
     std::cout << "\n";
 }
+
+void CPU::jump(Address address) {
+    r.pc = address;
+}

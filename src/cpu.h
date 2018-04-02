@@ -1,5 +1,7 @@
 #pragma once
 
+#include "address.h"
+
 #include <cstdint>
 #include <cstdlib>
 #include <vector>
@@ -37,6 +39,8 @@ public:
     bool isFlagSet(CPUFlag flag) const;
 
     void setFlag(CPUFlag flag, bool set);
+
+    void jump(Address address);
 
     void push(uint8_t value);
 

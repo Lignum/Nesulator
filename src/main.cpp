@@ -3,6 +3,10 @@
 #include "utils.h"
 
 #include <iostream>
+#include <thread>
+#include <chrono>
+
+static const unsigned int NANOSECONDS_PER_CYCLE = 602;
 
 int main() {
     iNES::File file;
@@ -27,8 +31,6 @@ int main() {
 
     CPU *cpu = nes.getCPU();
     Memory *mem = nes.getMemory();
-
-    const size_t programSize = 18;
 
     // LDA #$6F
     mem->write(0x00, 0xA9);
@@ -95,15 +97,11 @@ int main() {
     mem->write(0x0775, 0xE9);
     mem->write(0x0776, 0xBA);
 
-    for (size_t i = 0; i < programSize; i++) {
+    while (true) {
         cpu->printState();
-        cpu->step();
+        unsigned int cycles = cpu->step();
+        std::this_thread::sleep_for(std::chrono::nanoseconds(cycles * NANOSECONDS_PER_CYCLE));
     }
 
-    cpu->printState();
-
-    std::cout << "$0024: $";
-    Utils::writeHexToStream(std::cout, mem->read(0x0024));
-    std::cout << "\n";
     return EXIT_SUCCESS;
 }

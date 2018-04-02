@@ -7,6 +7,7 @@
 
 namespace iNES {
     extern const size_t PRG_ROM_SIZE;
+    extern const size_t PRG_RAM_SIZE;
     extern const size_t CHR_ROM_SIZE;
     extern const char HEADER_MAGIC_BYTES[4];
     extern const size_t TRAINER_SIZE;
@@ -17,7 +18,7 @@ namespace iNES {
         uint8_t chrROMCount;
         uint8_t flags6;
         uint8_t flags7;
-        uint8_t prgRAMSize;
+        uint8_t prgRAMCount;
         uint8_t padding[7];
     };
 

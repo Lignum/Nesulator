@@ -4,7 +4,7 @@
 #include "../utils.h"
 
 static void jump(CPU *cpu, Address address) {
-    cpu->getRegs()->pc = address;
+    cpu->jump(address);
 }
 
 unsigned int Op::jmp(CPU *cpu, Op::Operands &operands, const Op::Opcode *opcode) {

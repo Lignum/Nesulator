@@ -6,9 +6,9 @@
 #include <cstdint>
 
 namespace Utils {
-    template<typename T>
-    constexpr bool inRange(T x, T a, T b) {
-        return x >= a && x <= b;
+    template<typename A, typename B>
+    constexpr bool inRange(A x, B a, B b) {
+        return x >= (A)a && x <= (A)b;
     }
 
     constexpr uint16_t combineUint8sBE(uint8_t a, uint8_t b) {

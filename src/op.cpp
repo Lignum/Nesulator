@@ -553,7 +553,7 @@ void Op::formatInstruction(const Opcode *opcode, const Op::Operands &operands, s
             break;
 
         case AM::RELATIVE:
-            stream << " *" << (int8_t)operands[0];
+            stream << " *" << (int)((int8_t)operands[0]);
             break;
     }
 

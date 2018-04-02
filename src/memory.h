@@ -19,6 +19,10 @@ public:
 
     void write(Address address, uint8_t value);
 
+    Address getResetVector() const;
+
+    Address getIRQVector() const;
+
 private:
     NES *nes;
     std::vector<uint8_t> internalMem;
