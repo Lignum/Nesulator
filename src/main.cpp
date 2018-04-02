@@ -5,7 +5,26 @@
 #include <iostream>
 
 int main() {
-    NES nes;
+    iNES::File file;
+    iNES::LoadError error = iNES::loadFromFile("test.nes", file);
+
+    if (error != iNES::LoadError::NO_ERROR) {
+        std::cerr << "iNES Load Error: " << iNES::getLoadErrorMessage(error) << "\n";
+        return EXIT_FAILURE;
+    }
+
+    Cartridge cartridge(file);
+    NES nes(cartridge);
+
+    Mapper *mapper = nes.getCartridge()->getMapper();
+
+    if (mapper == nullptr) {
+        std::cerr << "The mapper that this game requires (" << (unsigned int)nes.getCartridge()->getMapperNumber() << ") has not been implemented yet!\n";
+        return EXIT_FAILURE;
+    }
+
+    std::cout << "iNES file has " << *mapper->getName() << " mapper (" << (unsigned int)mapper->getID() << ")\n";
+
     CPU *cpu = nes.getCPU();
     Memory *mem = nes.getMemory();
 
@@ -86,13 +105,5 @@ int main() {
     std::cout << "$0024: $";
     Utils::writeHexToStream(std::cout, mem->read(0x0024));
     std::cout << "\n";
-
-    iNES::File file;
-    iNES::LoadError error = iNES::loadFromFile("test.nes", file);
-
-    if (error != iNES::LoadError::NO_ERROR) {
-        std::cerr << "iNES Load Error: " << iNES::getLoadErrorMessage(error) << "\n";
-    }
-
-    return 0;
+    return EXIT_SUCCESS;
 }

@@ -18,8 +18,7 @@ namespace iNES {
         uint8_t flags6;
         uint8_t flags7;
         uint8_t prgRAMSize;
-        uint8_t flags9;
-        uint8_t padding[6];
+        uint8_t padding[7];
     };
 
     struct File {

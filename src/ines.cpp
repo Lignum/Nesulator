@@ -35,8 +35,7 @@ iNES::LoadError iNES::loadFromFile(const std::string &file, File &outFile) {
         fread(&outFile.header.flags6, sizeof(uint8_t), 1, fp) +
         fread(&outFile.header.flags7, sizeof(uint8_t), 1, fp) +
         fread(&outFile.header.prgRAMSize, sizeof(uint8_t), 1, fp) +
-        fread(&outFile.header.flags9, sizeof(uint8_t), 1, fp) +
-        fread(&outFile.header.padding, sizeof(uint8_t), 6, fp);
+        fread(&outFile.header.padding, sizeof(uint8_t), sizeof(outFile.header.padding) / sizeof(uint8_t), fp);
 
     if (headerBytesRead < 16) {
         fclose(fp);
@@ -67,12 +66,17 @@ iNES::LoadError iNES::loadFromFile(const std::string &file, File &outFile) {
         return getFileError(fp);
     }
 
-    const size_t chrSize = outFile.header.chrROMCount * iNES::CHR_ROM_SIZE;
-    outFile.chrROM.resize(chrSize);
+    if (outFile.header.chrROMCount > 0) {
+        const size_t chrSize = outFile.header.chrROMCount * iNES::CHR_ROM_SIZE;
+        outFile.chrROM.resize(chrSize);
 
-    if (fread(outFile.chrROM.data(), sizeof(uint8_t), chrSize, fp) < chrSize) {
-        fclose(fp);
-        return getFileError(fp);
+        if (fread(outFile.chrROM.data(), sizeof(uint8_t), chrSize, fp) < chrSize) {
+            fclose(fp);
+            return getFileError(fp);
+        }
+    } else {
+        // We're dealing with CHR-RAM.
+        outFile.chrROM.resize(iNES::CHR_ROM_SIZE, 0x00);
     }
 
     fclose(fp);

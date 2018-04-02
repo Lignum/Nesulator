@@ -1,12 +1,18 @@
 #include "nes.h"
 
+#include "cartridge.h"
 #include "cpu.h"
 #include "memory.h"
+#include "mappers.h"
 
-NES::NES()
-    : cpu(this),
+#include <utility>
+
+NES::NES(Cartridge &cartridge)
+    : cartridge(std::move(cartridge)),
+      cpu(this),
       mem(this)
 {
+    this->cartridge.initMapper(this);
 }
 
 CPU *NES::getCPU() {
@@ -15,4 +21,8 @@ CPU *NES::getCPU() {
 
 Memory *NES::getMemory() {
     return &mem;
+}
+
+Cartridge *NES::getCartridge() {
+    return &cartridge;
 }
