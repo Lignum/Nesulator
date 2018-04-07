@@ -8,6 +8,8 @@
 
 class NES;
 
+extern const size_t NES_NAMETABLE_SIZE;
+
 class Mapper {
 public:
     Mapper(NES *nes, uint8_t id, const std::string &name);
@@ -23,6 +25,10 @@ public:
     uint8_t getID() const;
 
     const std::string *getName() const;
+
+    uint8_t basicNametableRead(Address address);
+
+    void basicNametableWrite(Address address, uint8_t value);
 
 protected:
     NES *nes;
