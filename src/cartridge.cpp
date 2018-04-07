@@ -3,6 +3,7 @@
 #include "nes.h"
 #include "mappers.h"
 #include "ines.h"
+#include "utils.h"
 
 #include <utility>
 
@@ -12,7 +13,9 @@ Cartridge::Cartridge(iNES::File &file)
       prgram(file.header.prgRAMCount == 0 ? iNES::PRG_RAM_SIZE : file.header.prgRAMCount * iNES::PRG_RAM_SIZE),
       chrram(file.header.chrROMCount == 0),
       mapperNumber((uint8_t)((file.header.flags6 >> 4) | (file.header.flags7 & 0xF0))),
-      mapper(nullptr)
+      mapper(nullptr),
+      mirroring(Utils::isBitSet(file.header.flags6, 3) ? Mirroring::FOUR_SCREEN :
+                Utils::isBitSet(file.header.flags6, 0) ? Mirroring::VERTICAL : Mirroring::HORIZONTAL)
 {
 }
 
@@ -54,4 +57,8 @@ void Cartridge::initMapper(NES *nes) {
 
 uint8_t Cartridge::getMapperNumber() const {
     return mapperNumber;
+}
+
+Mirroring Cartridge::getMirroring() const {
+    return mirroring;
 }

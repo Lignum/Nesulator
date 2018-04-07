@@ -9,6 +9,12 @@
 
 class NES;
 
+enum class Mirroring: uint8_t {
+    VERTICAL,
+    HORIZONTAL,
+    FOUR_SCREEN
+};
+
 class Cartridge {
     friend class NES;
 public:
@@ -42,13 +48,17 @@ public:
 
     uint8_t getMapperNumber() const;
 
+    Mirroring getMirroring() const;
+
 private:
     void initMapper(NES *nes);
 
-    bool chrram;
     std::vector<uint8_t> prg;
     std::vector<uint8_t> chr;
     std::vector<uint8_t> prgram;
-    uint8_t mapperNumber;
     std::unique_ptr<Mapper> mapper;
+
+    bool chrram;
+    uint8_t mapperNumber;
+    Mirroring mirroring;
 };
