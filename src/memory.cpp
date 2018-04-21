@@ -41,9 +41,9 @@ uint8_t Memory::readCPU(Address address) const {
         Mapper *mapper = nes->getCartridge()->getMapper();
 
         if (mapper != nullptr) {
-            return mapper->read(address);
+            return mapper->readCPU(address);
         } else {
-            std::cout << "Warning: Could not read from address $";
+            std::cout << "Warning: Could not read from CPU address $";
             Utils::writeHexToStream(std::cout, address);
             std::cout << ", because the cartridge has no mapper! Assuming $00.\n";
             return 0x00;
@@ -51,7 +51,7 @@ uint8_t Memory::readCPU(Address address) const {
     } else if (Utils::inRange(address, 0x3F00, 0x3FFF)) {
         return paletteRAM[(address - 0x3F00) % NES_PALETTE_RAM_SIZE];
     } else {
-        std::cerr << "Could not read from unmapped address $";
+        std::cerr << "Could not read from unmapped CPU address $";
         Utils::writeHexToStream(std::cerr, address);
         std::cerr << "!!! Assuming $00.\n";
         return 0x00;
@@ -62,10 +62,21 @@ uint8_t Memory::readPPU(Address address) const {
     if (Utils::inRange(address, 0x3F00, 0x3FFF)) {
         return paletteRAM[(address - 0x3F00) % NES_PALETTE_RAM_SIZE];
     } else {
-        std::cerr << "Could not read from unmapped PPU address $";
-        Utils::writeHexToStream(std::cerr, address);
-        std::cerr << "!!! Assuming $00.\n";
-        return 0x00;
+        Mapper *mapper = nes->getCartridge()->getMapper();
+
+        if (mapper != nullptr) {
+            if (Utils::inRange(address, 0x3000, 0x3EFF)) {
+                // This is a mirror of $2000-$23FF, it would be a nuisance to implement this in every mapper.
+                address %= 0x0F00;
+            }
+
+            return mapper->readPPU(address);
+        } else {
+            std::cerr << "Could not read from unmapped PPU address $";
+            Utils::writeHexToStream(std::cerr, address);
+            std::cerr << "!!! Assuming $00.\n";
+            return 0x00;
+        }
     }
 }
 
@@ -76,14 +87,14 @@ void Memory::writeCPU(Address address, uint8_t value) {
         Mapper *mapper = nes->getCartridge()->getMapper();
 
         if (mapper != nullptr) {
-            mapper->write(address, value);
+            mapper->writeCPU(address, value);
         } else {
-            std::cout << "Warning: Could not write to address $";
+            std::cout << "Warning: Could not write to CPU address $";
             Utils::writeHexToStream(std::cout, address);
             std::cout << ", because the cartridge has no mapper!\n";
         }
     } else {
-        std::cerr << "Could not write to unmapped address $";
+        std::cerr << "Could not write to unmapped CPU address $";
         Utils::writeHexToStream(std::cerr, address);
         std::cerr << "!!!\n";
     }
@@ -93,9 +104,20 @@ void Memory::writePPU(Address address, uint8_t value) {
     if (Utils::inRange(address, 0x3F00, 0x3FFF)) {
         paletteRAM[(address - 0x3F00) % NES_PALETTE_RAM_SIZE] = value;
     } else {
-        std::cerr << "Could not write to unmapped PPU address $";
-        Utils::writeHexToStream(std::cerr, address);
-        std::cerr << "!!!\n";
+        Mapper *mapper = nes->getCartridge()->getMapper();
+
+        if (mapper != nullptr) {
+            if (Utils::inRange(address, 0x3000, 0x3EFF)) {
+                // This is a mirror of $2000-$23FF, it would be a nuisance to implement this in every mapper.
+                address %= 0x0F00;
+            }
+
+            mapper->writePPU(address, value);
+        } else {
+            std::cout << "Warning: Could not write to CPU address $";
+            Utils::writeHexToStream(std::cout, address);
+            std::cout << ", because the cartridge has no mapper!\n";
+        }
     }
 }
 

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "address.h"
+#include "memory.h"
 
 #include <cstdint>
 #include <string>
@@ -14,9 +15,17 @@ class Mapper {
 public:
     Mapper(NES *nes, uint8_t id, const std::string &name);
 
-    virtual uint8_t read(Address address) = 0;
+    uint8_t read(MemoryAccessSource source, Address address);
 
-    virtual void write(Address address, uint8_t value) = 0;
+    void write(MemoryAccessSource source, Address address, uint8_t value);
+
+    virtual uint8_t readCPU(Address address) = 0;
+
+    virtual uint8_t readPPU(Address address) = 0;
+
+    virtual void writeCPU(Address address, uint8_t value) = 0;
+
+    virtual void writePPU(Address address, uint8_t value) = 0;
 
     virtual void step() = 0;
 
@@ -26,11 +35,19 @@ public:
 
     const std::string *getName() const;
 
+protected:
     uint8_t basicNametableRead(Address address);
 
     void basicNametableWrite(Address address, uint8_t value);
 
-protected:
+    uint8_t basicPatternTableRead(Address address);
+
+    void basicPatternTableWrite(Address address, uint8_t value);
+
+    uint8_t basicPPURead(Address address);
+
+    void basicPPUWrite(Address address, uint8_t value);
+
     NES *nes;
 
 private:

@@ -79,3 +79,50 @@ void Mapper::basicNametableWrite(Address address, uint8_t value) {
     }
 }
 
+uint8_t Mapper::basicPatternTableRead(Address address) {
+    Cartridge *cartridge = nes->getCartridge();
+    auto *chr = cartridge->getCHR();
+
+    if (Utils::inRange(address, 0x0000, 0x1FFF)) {
+        return chr->at(address);
+    }
+}
+
+void Mapper::basicPatternTableWrite(Address address, uint8_t value) {
+    Cartridge *cartridge = nes->getCartridge();
+    auto *chr = cartridge->getCHR();
+
+    if (Utils::inRange(address, 0x0000, 0x1FFF)) {
+        chr->at(address) = value;
+    }
+}
+
+uint8_t Mapper::basicPPURead(Address address) {
+    if (Utils::inRange(address, 0x0000, 0x1FFF)) {
+        return basicPatternTableRead(address);
+    } else if (Utils::inRange(address, 0x2000, 0x2FFF)) {
+        return basicNametableRead(address);
+    }
+}
+
+void Mapper::basicPPUWrite(Address address, uint8_t value) {
+    if (Utils::inRange(address, 0x0000, 0x1FFF)) {
+        basicPatternTableWrite(address, value);
+    } else if (Utils::inRange(address, 0x2000, 0x2FFF)) {
+        basicPatternTableWrite(address, value);
+    }
+}
+
+uint8_t Mapper::read(MemoryAccessSource source, Address address) {
+    switch (source) {
+        case MemoryAccessSource::CPU: return readCPU(address);
+        case MemoryAccessSource::PPU: return readPPU(address);
+    }
+}
+
+void Mapper::write(MemoryAccessSource source, Address address, uint8_t value) {
+    switch (source) {
+        case MemoryAccessSource::CPU: return writeCPU(address, value);
+        case MemoryAccessSource::PPU: return writePPU(address, value);
+    }
+}
