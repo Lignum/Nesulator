@@ -396,7 +396,7 @@ uint8_t Op::address(CPU *cpu, Op::AddressingMode mode, const Op::Operands &opera
             return operands[0];
 
         default:
-            return mem->read(getAddress(cpu, mode, operands));
+            return mem->readCPU(getAddress(cpu, mode, operands));
     }
 }
 
@@ -414,7 +414,7 @@ void Op::addressWrite(CPU *cpu, Op::AddressingMode mode, const Op::Operands &ope
             break;
 
         default:
-            mem->write(getAddress(cpu, mode, operands), value);
+            mem->writeCPU(getAddress(cpu, mode, operands), value);
             break;
     }
 }
@@ -453,15 +453,15 @@ Address Op::getAddress(CPU *cpu, Op::AddressingMode mode, const Op::Operands &op
 
         case AM::INDIRECT: {
             Address addrAddr = Utils::combineUint8sLE(operands[0], operands[1]);
-            return Utils::combineUint8sLE(mem->read(addrAddr), mem->read(addrAddr + (Address)1));
+            return Utils::combineUint8sLE(mem->readCPU(addrAddr), mem->readCPU(addrAddr + (Address)1));
         }
 
         case AM::INDEXED_INDIRECT:
-            return mem->read((Address)(operands[0] + r->x));
+            return mem->readCPU((Address)(operands[0] + r->x));
 
         case AM::INDIRECT_INDEXED: {
-            Address addrAddr = mem->read(operands[0]) + r->y;
-            return Utils::combineUint8sLE(mem->read(addrAddr), mem->read(addrAddr + (Address)1));
+            Address addrAddr = mem->readCPU(operands[0]) + r->y;
+            return Utils::combineUint8sLE(mem->readCPU(addrAddr), mem->readCPU(addrAddr + (Address)1));
         }
     }
 }

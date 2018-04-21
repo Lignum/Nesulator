@@ -9,7 +9,7 @@
     unsigned int Op::st##x(CPU *cpu, Op::Operands &operands, const Op::Opcode *opcode) { \
         Memory *mem = cpu->getNES()->getMemory(); \
         Address addr = Op::getAddress(cpu, opcode->mode, operands); \
-        mem->write(addr, cpu->getRegs()->x); \
+        mem->writeCPU(addr, cpu->getRegs()->x); \
         return 0; \
     }
 

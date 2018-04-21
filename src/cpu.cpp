@@ -39,13 +39,13 @@ void CPU::setFlag(CPUFlag flag, bool set) {
 }
 
 void CPU::push(uint8_t value) {
-    nes->getMemory()->write(NES_STACK_ADDRESS + r.s, value);
+    nes->getMemory()->writeCPU(NES_STACK_ADDRESS + r.s, value);
     r.s--;
 }
 
 uint8_t CPU::pull() {
     r.s++;
-    return nes->getMemory()->read(NES_STACK_ADDRESS + r.s);
+    return nes->getMemory()->readCPU(NES_STACK_ADDRESS + r.s);
 }
 
 unsigned int CPU::step() {
@@ -76,7 +76,7 @@ unsigned int CPU::step() {
 
 uint8_t CPU::fetch() {
     Memory *mem = nes->getMemory();
-    uint8_t op = mem->read((Address)r.pc);
+    uint8_t op = mem->readCPU((Address)r.pc);
     r.pc++;
     return op;
 }
