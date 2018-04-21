@@ -31,11 +31,11 @@ RegisterFile *CPU::getRegs() {
 }
 
 bool CPU::isFlagSet(CPUFlag flag) const {
-    return ((uint8_t)r.p & (uint8_t)flag) == (uint8_t)flag;
+    return Utils::isFlagSet8(r.p, flag);
 }
 
 void CPU::setFlag(CPUFlag flag, bool set) {
-    r.p = (CPUFlag)(set ? (uint8_t)r.p | (uint8_t)flag : (uint8_t)r.p & ~(uint8_t)flag);
+    r.p = Utils::setFlag8(r.p, flag, set);
 }
 
 void CPU::push(uint8_t value) {

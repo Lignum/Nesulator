@@ -43,4 +43,24 @@ namespace Utils {
     void writeBinaryToStream(std::ostream &stream, T x) {
         stream << std::bitset<sizeof(T) * 8>(x);
     }
+
+    template<typename T, typename I>
+    constexpr bool isFlagSet(T flags, T flag) {
+        return (T)((I)flags & (I)flag) == flag;
+    }
+
+    template<typename T>
+    constexpr bool isFlagSet8(T flags, T flag) {
+        return isFlagSet<T, uint8_t>(flags, flag);
+    }
+
+    template<typename T, typename I>
+    constexpr T setFlag(T flags, T flag, bool set) {
+        return (T)(set ? (I)flags | (I)flag : (I)flags & ~(I)flag);
+    }
+
+    template<typename T>
+    constexpr T setFlag8(T flags, T flag, bool set) {
+        return setFlag<T, uint8_t>(flags, flag, set);
+    }
 }
