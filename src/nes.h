@@ -2,6 +2,7 @@
 
 #include "cartridge.h"
 #include "cpu.h"
+#include "ppu.h"
 #include "memory.h"
 
 class NES {
@@ -17,10 +18,13 @@ public:
 
     CPU *getCPU();
 
+    PPU *getPPU();
+
     Memory *getMemory();
 
 private:
     Cartridge cartridge;
     CPU cpu;
+    PPU ppu;
     Memory mem;
 };

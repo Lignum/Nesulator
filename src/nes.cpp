@@ -27,3 +27,7 @@ Memory *NES::getMemory() {
 Cartridge *NES::getCartridge() {
     return &cartridge;
 }
+
+PPU *NES::getPPU() {
+    return &ppu;
+}
