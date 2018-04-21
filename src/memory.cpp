@@ -24,7 +24,6 @@ uint8_t Memory::read(MemoryAccessSource source, Address address) const {
         case MemoryAccessSource::CPU: return readCPU(address);
         case MemoryAccessSource::PPU: return readPPU(address);
     }
-
 }
 
 void Memory::write(MemoryAccessSource source, Address address, uint8_t value) {
