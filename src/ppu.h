@@ -23,6 +23,7 @@ enum class PPUControlFlag : uint8_t {
     SPRITE_HEIGHT = 1 << 2,
     BACKGROUND_PATTERN_TABLE = 1 << 3,
     SPRITE_PATTERN_TABLE = 1 << 4,
+    INCREMENT_MODE = 1 << 5
 };
 
 enum class PPUMaskFlag : uint8_t {
@@ -42,13 +43,15 @@ enum class PPUStatusFlag : uint8_t {
     SPRITE_OVERFLOW
 };
 
+class NES;
+
 class PPU {
 public:
-    PPU();
+    PPU(NES *nes);
 
     void writeRegister(PPURegister reg, uint8_t value);
 
-    uint8_t readRegister(PPURegister reg) const;
+    uint8_t readRegister(PPURegister reg);
 
     bool isControlFlagSet(PPUControlFlag flag) const;
 
@@ -70,6 +73,8 @@ public:
     static const size_t OBJECT_ATTRIBUTE_MEMORY_SIZE;
 
 private:
+    NES *nes;
+
     PPUControlFlag controlFlags;
     PPUMaskFlag maskFlags;
     PPUStatusFlag statusFlags;
@@ -81,7 +86,10 @@ private:
     uint8_t scrollX;
     uint8_t scrollY;
 
-    uint16_t address;
+    Address address;
+    uint8_t oamAddress; // OAM is just 256 bytes big, hence we can use an 8-bit address.
 
     std::vector<uint8_t> oam;
+
+    void incrementAddress();
 };

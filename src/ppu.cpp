@@ -1,14 +1,18 @@
 #include "ppu.h"
 
 #include "utils.h"
+#include "nes.h"
+#include "memory.h"
 
 #include <iostream>
+#include <algorithm>
 
 const size_t PPU::SPRITE_SIZE = 0x4;
 const size_t PPU::OBJECT_ATTRIBUTE_MEMORY_SIZE = 64 * SPRITE_SIZE;
 
-PPU::PPU()
-    : controlFlags((PPUControlFlag)0x00),
+PPU::PPU(NES *nes)
+    : nes(nes),
+      controlFlags((PPUControlFlag)0x00),
       maskFlags((PPUMaskFlag)0x00),
       statusFlags((PPUStatusFlag)0x00),
       ppuLatch(0x00),
@@ -54,17 +58,47 @@ void PPU::writeRegister(PPURegister reg, uint8_t value) {
 
             addressLatch = !addressLatch;
             break;
-            
-        default:
-            std::cerr << "writeRegister: NYI\n";
+
+        case PPURegister::PPUDATA:
+            nes->getMemory()->writePPU(address, value);
+            incrementAddress();
+            break;
+
+        case PPURegister::OAMADDR:
+            oamAddress = value;
+            break;
+
+        case PPURegister::OAMDATA:
+            oam[oamAddress++] = value;
+            break;
+
+        case PPURegister::OAMDMA: {
+            const Memory *mem = nes->getMemory();
+            const Address start = (Address)value << 8;
+
+            for (Address i = 0; i < oam.size(); i++) {
+                oam[i] = mem->readPPU(i + start);
+            }
+
+            break;
+        }
+
+        case PPURegister::PPUSTATUS:
             break;
     }
 }
 
-uint8_t PPU::readRegister(PPURegister reg) const {
+uint8_t PPU::readRegister(PPURegister reg) {
     switch (reg) {
         case PPURegister::PPUSTATUS:
             return (uint8_t)statusFlags | (ppuLatch & (uint8_t)0b00011111);
+
+        case PPURegister::PPUDATA:
+            incrementAddress();
+            return nes->getMemory()->readPPU(address);
+
+        case PPURegister::OAMDATA:
+            return oam[oamAddress++];
 
         // "Write-only" registers.
         case PPURegister::PPUCTRL:
@@ -123,5 +157,13 @@ bool PPU::isStatusFlagSet(PPUStatusFlag flag) const {
 
 void PPU::setStatusFlag(PPUStatusFlag flag, bool set) {
     statusFlags = Utils::setFlag8(statusFlags, flag, set);
+}
+
+void PPU::incrementAddress() {
+    if (isControlFlagSet(PPUControlFlag::INCREMENT_MODE)) {
+        address += 32;
+    } else {
+        address++;
+    }
 }
 

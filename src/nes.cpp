@@ -10,6 +10,7 @@
 NES::NES(Cartridge &cartridge)
     : cartridge(std::move(cartridge)),
       cpu(this),
+      ppu(this),
       mem(this)
 {
     this->cartridge.initMapper(this);
