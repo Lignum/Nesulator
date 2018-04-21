@@ -19,7 +19,11 @@ void PPU::writeRegister(PPURegister reg, uint8_t value) {
 }
 
 Address PPU::getPPURegisterAddress(PPURegister reg) {
-    return (Address)reg + (Address)0x2000;
+    if (reg == PPURegister::OAMDMA) {
+        return 0x4014;
+    } else {
+        return (Address)reg + (Address)0x2000;
+    }
 }
 
 bool PPU::getRegisterFromAddress(Address address, PPURegister *outReg) {
@@ -29,6 +33,9 @@ bool PPU::getRegisterFromAddress(Address address, PPURegister *outReg) {
 
     if (Utils::inRange(address, 0x2000, 0x2007)) {
         *outReg = (PPURegister)(address - 0x2000);
+        return true;
+    } else if (address == 0x4014) {
+        *outReg = PPURegister::OAMDMA;
         return true;
     }
 

@@ -36,7 +36,7 @@ void Memory::write(MemoryAccessSource source, Address address, uint8_t value) {
 uint8_t Memory::readCPU(Address address) const {
     if (Utils::inRange(address, 0x0000, 0x1FFF)) {
         return internalMem[address % 0x0800];
-    } else if (Utils::inRange(address, 0x2000, 0x2007)) {
+    } else if (Utils::inRange(address, 0x2000, 0x2007) || address == 0x4014) {
         PPURegister reg;
 
         if (PPU::getRegisterFromAddress(address, &reg)) {
