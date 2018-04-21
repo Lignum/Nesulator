@@ -37,7 +37,7 @@ void Memory::write(MemoryAccessSource source, Address address, uint8_t value) {
 uint8_t Memory::readCPU(Address address) const {
     if (Utils::inRange(address, 0x0000, 0x1FFF)) {
         return internalMem[address % 0x0800];
-    } else if (Utils::inRange(address, 0x6000, 0xFFFF)) {
+    } else if (Utils::inRange(address, 0x4020, 0xFFFF)) {
         Mapper *mapper = nes->getCartridge()->getMapper();
 
         if (mapper != nullptr) {
@@ -83,7 +83,7 @@ uint8_t Memory::readPPU(Address address) const {
 void Memory::writeCPU(Address address, uint8_t value) {
     if (Utils::inRange(address, 0x0000, 0x1FFF)) {
         internalMem[address % 0x0800] = value;
-    } else if (Utils::inRange(address, 0x6000, 0xFFFF)) {
+    } else if (Utils::inRange(address, 0x4020, 0xFFFF)) {
         Mapper *mapper = nes->getCartridge()->getMapper();
 
         if (mapper != nullptr) {
