@@ -9,11 +9,14 @@
 static const unsigned int NANOSECONDS_PER_CYCLE = 602;
 
 int main() {
-    iNES::File file;
+	iNES::File file = {};
     iNES::LoadError error = iNES::loadFromFile("test.nes", file);
 
     if (error != iNES::LoadError::NO_ERROR) {
         std::cerr << "iNES Load Error: " << iNES::getLoadErrorMessage(error) << "\n";
+#ifdef _WIN32
+		std::cin.get();
+#endif
         return EXIT_FAILURE;
     }
 
@@ -24,6 +27,9 @@ int main() {
 
     if (mapper == nullptr) {
         std::cerr << "The mapper that this game requires (" << (unsigned int)nes.getCartridge()->getMapperNumber() << ") has not been implemented yet!\n";
+#ifdef _WIN32
+		std::cin.get();
+#endif
         return EXIT_FAILURE;
     }
 

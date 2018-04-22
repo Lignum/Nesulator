@@ -32,10 +32,8 @@ namespace iNES {
     enum class LoadError {
         NO_ERROR,
         MAGIC_BYTES_MISMATCH,
-        EARLY_END_OF_FILE,
         READ_ERROR,
         OPEN_FAILED,
-        UNKNOWN_ERROR
     };
 
     LoadError loadFromFile(const std::string &file, File &outFile);
