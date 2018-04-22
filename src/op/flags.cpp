@@ -17,7 +17,7 @@
 CL(c, CPUFlag::CARRY);
 CL(d, CPUFlag::DECIMAL_MODE);
 CL(i, CPUFlag::IRQ_DISABLE);
-CL(v, CPUFlag::OVERFLOW);
+CL(v, CPUFlag::OVER_FLOW);
 
 SE(c, CPUFlag::CARRY);
 SE(d, CPUFlag::DECIMAL_MODE);

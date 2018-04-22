@@ -8,6 +8,7 @@
         const uint8_t value = f(cpu, Op::address(cpu, opcode->mode, operands)); \
         Op::setNZFlags(cpu, value); \
         Op::addressWrite(cpu, opcode->mode, operands, value); \
+		return 0; \
     }
 
 static uint8_t computeASL(CPU *cpu, uint8_t x) {
@@ -57,6 +58,7 @@ UNARY_MEM_ACC(dec, computeDEC);
         RegisterFile *r = cpu->getRegs(); \
         r->reg = f(cpu, r->reg); \
         Op::setNZFlags(cpu, r->reg); \
+		return 0; \
     }
 
 UNARY_REG(inx, x, computeINC);
@@ -96,7 +98,7 @@ static uint8_t computeADC(CPU *cpu, uint8_t a, uint8_t b) {
     const auto carry = (uint8_t)(cpu->isFlagSet(CPUFlag::CARRY) ? 1 : 0);
     const uint16_t sum = a + b + carry;
     cpu->setFlag(CPUFlag::CARRY, sum > 0xFF);
-    cpu->setFlag(CPUFlag::OVERFLOW, (~(a ^ b) & (a ^ sum) & (1 << 7)) > 0); // https://stackoverflow.com/a/29224684
+    cpu->setFlag(CPUFlag::OVER_FLOW, (~(a ^ b) & (a ^ sum) & (1 << 7)) > 0); // https://stackoverflow.com/a/29224684
     return (uint8_t)sum;
 }
 
@@ -114,7 +116,7 @@ unsigned int Op::bit(CPU *cpu, Op::Operands &operands, const Op::Opcode *opcode)
     uint8_t a = r->a & v;
     Op::setZeroFlag(cpu, a);
     Op::setNegativeFlag(cpu, v);
-    cpu->setFlag(CPUFlag::OVERFLOW, ((v >> 6) & 0b1) == 1);
+    cpu->setFlag(CPUFlag::OVER_FLOW, ((v >> 6) & 0b1) == 1);
     return 0;
 }
 

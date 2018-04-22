@@ -109,6 +109,8 @@ uint8_t PPU::readRegister(PPURegister reg) {
         case PPURegister::OAMDMA:
             return ppuLatch;
     }
+
+	return 0;
 }
 
 Address PPU::getPPURegisterAddress(PPURegister reg) {

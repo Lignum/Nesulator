@@ -35,8 +35,8 @@ BRANCH_IF_SET(beq, CPUFlag::ZERO);
 BRANCH_IF_SET(bmi, CPUFlag::NEGATIVE);
 BRANCH_IF_CLEAR(bne, CPUFlag::ZERO);
 BRANCH_IF_CLEAR(bpl, CPUFlag::NEGATIVE);
-BRANCH_IF_CLEAR(bvc, CPUFlag::OVERFLOW);
-BRANCH_IF_SET(bvs, CPUFlag::OVERFLOW)
+BRANCH_IF_CLEAR(bvc, CPUFlag::OVER_FLOW);
+BRANCH_IF_SET(bvs, CPUFlag::OVER_FLOW)
 
 unsigned int Op::jsr(CPU *cpu, Op::Operands &operands, const Op::Opcode *opcode) {
     RegisterFile *r = cpu->getRegs();

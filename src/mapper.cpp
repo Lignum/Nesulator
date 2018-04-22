@@ -50,6 +50,8 @@ uint8_t Mapper::basicNametableRead(Address address) {
             std::cout << "Warning: This mapper does not support four-screen mode, yet the cartridge requires it! Assuming $00.\n";
             return 0;
     }
+
+	return 0;
 }
 
 void Mapper::basicNametableWrite(Address address, uint8_t value) {
@@ -86,6 +88,8 @@ uint8_t Mapper::basicPatternTableRead(Address address) {
     if (Utils::inRange(address, 0x0000, 0x1FFF)) {
         return chr->at(address);
     }
+
+	return 0;
 }
 
 void Mapper::basicPatternTableWrite(Address address, uint8_t value) {
@@ -103,6 +107,8 @@ uint8_t Mapper::basicPPURead(Address address) {
     } else if (Utils::inRange(address, 0x2000, 0x2FFF)) {
         return basicNametableRead(address);
     }
+
+	return 0;
 }
 
 void Mapper::basicPPUWrite(Address address, uint8_t value) {
@@ -118,6 +124,8 @@ uint8_t Mapper::read(MemoryAccessSource source, Address address) {
         case MemoryAccessSource::CPU: return readCPU(address);
         case MemoryAccessSource::PPU: return readPPU(address);
     }
+
+	return 0;
 }
 
 void Mapper::write(MemoryAccessSource source, Address address, uint8_t value) {

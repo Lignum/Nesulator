@@ -2,3 +2,15 @@
 /cmake-build-debug/
 /cmake-build-release/
 *.nes
+/CMakeFiles/
+CMakeCache.txt
+*.sln
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
+cmake_install.cmake
+/Win32/
+/Nesulator.dir/
+/Debug/
+/Release/
+/.vs/

@@ -379,6 +379,8 @@ size_t Op::getAddressingModeOperandCount(Op::AddressingMode mode) {
         case AM::INDIRECT:
             return 2;
     }
+
+	return 0;
 }
 
 uint8_t Op::address(CPU *cpu, Op::AddressingMode mode, const Op::Operands &operands) {
@@ -464,6 +466,8 @@ Address Op::getAddress(CPU *cpu, Op::AddressingMode mode, const Op::Operands &op
             return Utils::combineUint8sLE(mem->readCPU(addrAddr), mem->readCPU(addrAddr + (Address)1));
         }
     }
+
+	return 0;
 }
 
 void Op::setNegativeFlag(CPU *cpu, uint8_t value) {

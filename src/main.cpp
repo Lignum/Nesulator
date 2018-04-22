@@ -37,5 +37,9 @@ int main() {
         std::this_thread::sleep_for(std::chrono::nanoseconds(cycles * NANOSECONDS_PER_CYCLE));
     }
 
+#ifdef _WIN32
+	std::cin.get();
+#endif
+
     return EXIT_SUCCESS;
 }

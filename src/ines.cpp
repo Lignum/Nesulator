@@ -104,5 +104,7 @@ std::string iNES::getLoadErrorMessage(iNES::LoadError error) {
         case iNES::LoadError::EARLY_END_OF_FILE:
             return "File ended abruptly. Is the file corrupted?";
     }
+
+	return "N/A";
 }
 
